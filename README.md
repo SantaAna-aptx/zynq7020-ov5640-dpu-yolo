@@ -267,7 +267,7 @@ darknet 风格 letterbox（保持宽高比、灰边填充 0.5）+ 带 letterbox 
 
 | 文件 | 来源 | 本项目所做的改动 |
 |---|---|---|
-| `rtl/I2C_OV5640_1280720_Config.v` | **CrazyBingo**（www.cnblogs.com/crazybingo）<br>Copyright 2012, All Rights Reserved | OV5640 上电寄存器配置表，摄像头能出图的关键依赖。末尾追加 `0x3820` / `0x3821`（消除上下分屏），修正 `0x4300=0x61`（R/B 顺序） |
+| `rtl/I2C_OV5640_1280720_Config.v` | **CrazyBingo**（www.cnblogs.com/crazybingo）<br>Copyright 2012, All Rights Reserved | OV5640 上电寄存器配置表，摄像头能出图的关键依赖。本项目在其末尾**追加了覆盖项**（`0x3820` / `0x3821` 等，同一寄存器在表中出现两次时**后面的索引生效**），并修正了 SCCB 时序与接线。⚠️ 该表存在 `LUT_SIZE` 截断问题（索引 258 的条目永远写不出去），详见 [`skill/pitfalls/dvp-camera-bringup.md`](skill/pitfalls/dvp-camera-bringup.md) §3.10 |
 | `rtl/i2c_timing_ctrl_reg16_dat8_wronly.v` | **CrazyBingo** | SCCB/I2C 时序控制器。SCL 降速至 33 kHz、SDA 改开路漏极、增加 sticky ACK 输出 |
 | `rtl/asyn_fifo.v` | 第三方（见文件头） | 未改动 |
 
@@ -324,7 +324,7 @@ arm-linux-gnueabihf-elfedit --output-type=rel deephi.o     # 必须，否则链�
 | `build/` | `vivado_projects/unified/`、`board_deploy/build_cam_stream.ps1` | Vivado 工程、Block Design 与可复现构建脚本 |
 | `board/` | `board_deploy/bringup_and_stream.ps1`、`deploy_stream.ps1`、`unified_clkfix_sw.bin` | 上板工程与运行脚本 |
 | `data/` | `docs/`、`board_deploy/backup/` | 实测输出、基线版本与参考结果 |
-| `skill/` | **待补** | 技能包（从开发过程中沉淀的可复用经验） |
+| `skill/` | `skill/` ✅ **已提交** | 技能包：11 项踩坑清单、3 项案例模板、2 个校验脚本、2 项提示词工作流。索引与每项的适用范围/使用方法/失效条件见 [`skill/README.md`](skill/README.md) |
 | `report/` | `board_deploy/*.md`（见 §9 文档索引）；正式设计报告**待补** | 设计文档、踩坑记录与设计报告 |
 
 > 所有目录名与文件名均为纯英文（小写字母、数字、下划线或连字符），符合跨平台复现要求。

@@ -15,7 +15,7 @@ that the camera path can be reproduced end to end.
 | Author | **CrazyBingo** — <https://www.cnblogs.com/crazybingo> |
 | Header | `Copyright 2012, All Rights Reserved` |
 | Purpose | OV5640 power-on register configuration table (720p RGB565, 252 entries) |
-| Local changes | appended `0x3820` / `0x3821` (removes the split-screen artefact); corrected `0x4300 = 0x61` (R/B channel order) |
+| Local changes | appended duplicate entries for `0x3820` / `0x3821` (the low three bits of `0x3820` differ from the reference design); `0x4300 = 0x61` was **kept unchanged** after measuring per-channel means (R 79.4 / G 91.8 / B 80.8 — R ≈ B rules out an R/B swap). See `skill/pitfalls/dvp-camera-bringup.md` section 3.10 for the register-table caveats, including a `LUT_SIZE` truncation that makes the highest-index entry unreachable |
 
 ⚠️ The original header additionally states `CONFIDENTIAL IN CONFIDENCE` — *"This confidential
 and proprietary software may be only used as authorized by a license agreement."*
