@@ -258,6 +258,8 @@ darknet 风格 letterbox（保持宽高比、灰边填充 0.5）+ 带 letterbox 
 | 框的滞后 | 约 250 ms（DPU 193 ms + 解码）。快速移动的目标框会"飘" —— 这是 DPU 硬件的账，软件无法消除 |
 | 开机自启 | 未做。断电后需运行 `bringup_and_stream.ps1` |
 | 摄像头通路 | 存在一条 DRC 警告（跨时钟域 FIFO 的异步复位），目前画面干净，但若出现随机坏行优先查这里 |
+| **仿真的覆盖范围** | 仿真**只覆盖自研 RTL**：`fw_tb`（`frame_writer`）已通过；`cam_tb` 与 `cam_tb2` 与当前 RTL 参数脱节，原因与改进方向见 [`sim/README.md`](sim/README.md) §3。**不覆盖 DPU IP 内部，也不覆盖 PS 侧软件** |
+| 现场画面检出率 | 实时场景 `boxes=0`，因为场景中没有 COCO 类别的显著目标。判据是"`identical=1` + 置信度随输入变化 + 计数在增长"三者同时成立，见 [`data/measured_performance.md`](data/measured_performance.md) §5 |
 
 ---
 
@@ -320,12 +322,12 @@ arm-linux-gnueabihf-elfedit --output-type=rel deephi.o     # 必须，否则链�
 |---|---|---|
 | `README.md` | `README.md` | 项目简介与复现步骤 |
 | `src/` | `rtl/`、`board_deploy/cam_stream.cpp`、`system-user.dtsi` | PL 采集 RTL 与 PS 侧软件 |
-| `sim/` | `rtl/cam_tb.v`、`rtl/cam_tb2.v`、`rtl/fw_tb.v`、`rtl/run_sim.bat` | 仿真测试台与运行脚本 |
-| `build/` | `vivado_projects/unified/`、`board_deploy/build_cam_stream.ps1` | Vivado 工程、Block Design 与可复现构建脚本 |
+| `sim/` | `sim/` ✅ **新增**（testbench 源码仍在 `rtl/`） | 参数化仿真运行脚本、结果归档、三层验证体系说明 |
+| `build/` | `build/reports/` ✅ **新增**；Vivado 工程本体在 `vivado_projects/unified/` | 综合与实现报告（含优化前后对比表）；构建脚本在 `board_deploy/` |
 | `board/` | `board_deploy/bringup_and_stream.ps1`、`deploy_stream.ps1`、`unified_clkfix_sw.bin` | 上板工程与运行脚本 |
-| `data/` | `docs/`、`board_deploy/backup/` | 实测输出、基线版本与参考结果 |
-| `skill/` | `skill/` ✅ **已提交** | 技能包：11 项踩坑清单、3 项案例模板、2 个校验脚本、2 项提示词工作流。索引与每项的适用范围/使用方法/失效条件见 [`skill/README.md`](skill/README.md) |
-| `report/` | `board_deploy/*.md`（见 §9 文档索引）；正式设计报告**待补** | 设计文档、踩坑记录与设计报告 |
+| `data/` | `data/` ✅ **新增** | 8 图验收评分卡、确定性（黄金比对）记录、实测性能数据 |
+| `skill/` | `skill/` ✅ | 技能包：11 项踩坑清单、3 项案例模板、2 个校验脚本、2 项提示词工作流。索引与每项的适用范围/使用方法/失效条件见 [`skill/README.md`](skill/README.md) |
+| `report/` | `report/` ✅ **新增** | 设计报告（赛题七项要求全覆盖）+ 大模型协作记录；另有 `board_deploy/*.md`（见 §9）作为开发期文档 |
 
 > 所有目录名与文件名均为纯英文（小写字母、数字、下划线或连字符），符合跨平台复现要求。
 
