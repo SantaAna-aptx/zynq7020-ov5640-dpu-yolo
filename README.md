@@ -275,8 +275,8 @@ darknet 风格 letterbox（保持宽高比、灰边填充 0.5）+ 带 letterbox 
 > `CONFIDENTIAL IN CONFIDENCE` / *This confidential and proprietary software may be only used
 > as authorized by a license agreement*。本项目**未从原作者处取得书面再分发授权**，保留它们
 > 是为了让摄像头通路可复现。若需商业使用或再分发，请自行联系原作者取得许可，或自行实现
-> 等价的 SCCB 主机与寄存器配置表。**这两个文件不适用本仓库的 MIT 协议**（见 `LICENSE`
-> 末尾的 Third-party notice）。
+> 等价的 SCCB 主机与寄存器配置表。**这两个文件不适用本仓库的 MIT 协议**，
+> 详细的来源、改动记录与处置建议见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 
 **自研部分**（本项目的主要工作）：
 
@@ -335,6 +335,7 @@ arm-linux-gnueabihf-elfedit --output-type=rel deephi.o     # 必须，否则链�
 
 本仓库**原创部分**采用 **MIT License**，见 [`LICENSE`](LICENSE)。
 
-- 第三方 RTL 文件的权利仍属原作者，**不适用** MIT 协议，来源与改动情况详见 §11；
+- 第三方 RTL 文件的权利仍属原作者，**不适用** MIT 协议，来源与改动情况详见
+  [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) 与 §11；
 - Xilinx/AMD 专有材料（DNNDK、DPU TRD、Vivado 生成的 IP wrapper）**未包含**在本仓库中，
   请从 AMD 官方渠道获取。

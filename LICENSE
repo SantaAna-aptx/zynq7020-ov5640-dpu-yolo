@@ -19,19 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Third-party notice
-------------------
-
-This MIT license covers the original work in this repository only. The
-following files are third-party code and remain under their own terms; see
-section 12 of README.md for provenance and attribution:
-
-  rtl/I2C_OV5640_1280720_Config.v
-  rtl/i2c_timing_ctrl_reg16_dat8_wronly.v
-  rtl/asyn_fifo.v
-
-Xilinx/AMD proprietary material (DNNDK, DPU TRD, generated IP wrappers) is not
-licensed under the terms above and is not distributed with this repository.
