@@ -1,0 +1,155 @@
+===== PAGE 1 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+511
+23PL自定义AXI-Lite协议IP软件版本：vitis2021.1(vivado2021.1)操作系统：WIN10 64bit硬件平台：适用XILINX A7/K7/Z7/ZU/KU系列FPGA登录“米联客”FPGA社区-www.uisrc.com视频课程、答疑解惑！23.1概述XILINX ZYNQ以及ZYNQ MPSOC相比其他厂家的异构ARM+FPGA,独领风骚。其中关键非常关键的一点使用了AXI总线进行高速互联。 而且这个AXI总线是开放给我们用户使用的。 在前面我们使用的AXI-GPIO、AXI-IIC、AXI-UART等IP方案中都使用到了AXI总线对FPGA部分的IP互联到AXI总线，因为ARM的CPU也是互联到AXI总线，这样FPGA和ARM就可以交互数据了。常用的AXI总线包括AXI4-Lite，AXI4-FULL和AXI4-Stream三种总线协议， 需要注意的是PS与PL之间的接口 （AXI-GP接口，AXI-HP接口以及AXI-ACP接口） 只支持AXI-Lite和AXI-FULL后面默认AXI就是AXI-FULL)协议这两种总线协议。也就是说PL这边的AXI-Stream的接口是不能直接与PS对接的，需要经过AXI4或者AXI4-Lite的转换。 比如后面将用到的VDMA IP， 它就实现了在PL内部AXI4到AXI-Stream的转换，VDMA利用的接口就是AXI-HP接口。本文首先介绍AXI总线协议、AXI-Stream协议、AXI-lite协议，然后本文以AXI-Lite作为demo。我们在后续的文章中，会单独开辟一个章节，详细介绍AXI4-FULL、AXI-LITE、AXI-Stream。本文实验目的：1:学习AXI总线协议包括AXI-FULL、AXI-Lite、AXI-Stream2:掌握基于VIVADO工具产生AXI协议模板3:掌握通过VIVADO工具产生AXI-lite-Slave代码，并且会修改寄存器4:理解AXI-lite-Slave中自定义寄存器的地址分配5:掌握通过VIVADO封装AXI-LITE-SLAVE图形化IP6:掌握通过VITIS-SDK访问AXI-LITE-SLAVE的寄存器23.2系统框图
+
+===== PAGE 2 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+512
+23.3AXI总线协议介绍23.3.1AXI总线概述在ZYNQ Ultrascale+中有支持三种AXI总线，拥有三种AXI接口，当然用的都是AXI协议。其中三种AXI总线分别为：AXI4：（For high-performance memory-mapped requirements.）主要面向高性能地址映射通信的需求，是面向地址映射的接口，允许最大256轮的数据突发传输；AXI4-Lite： （For simple, low-throughput memory-mapped communication） 是一个轻量级的地址映射单次传输接口，占用很少的逻辑单元。AXI4-Stream：（For high-speed streaming data.）面向高速流数据传输；去掉了地址项，允许无限制的数据突发传输规模。AXI4总线和AXI4-Lite总线具有相同的组成部分：（1）读地址通道，包含ARV ALID, ARADDR, ARREADY信号；（2）读数据通道，包含RV ALID, RDATA, RREADY , RRESP信号；（3）写地址通道，包含AWV ALID，AW ADDR, AWREADY信号；（4）写数据通道，包含WV ALID, WDATA，WSTRB, WREADY信号；（5）写应答通道，包含BV ALID, BRESP, BREADY信号；（6）系统通道，包含：ACLK，ARESETN信号。AXI4总线和AXI4-Lite总线的信号也有他的命名特点：读地址信号都是以AR开头（A：address；R：read）写地址信号都是以AW开头（A：address；W：write）读数据信号都是以R开头（R：read）写数据信号都是以W开头（W：write）应答型号都是以B开头（B：back（answer back））了解到总线的组成部分以及命名特点，那么在后续的实验中您将逐渐看到他们的身影。每个信号的作用暂停不表，放在后面一一介绍。AXI4-Stream总线的组成有：（1）ACLK信号：总线时钟，上升沿有效；（2）ARESETN信号：总线复位，低电平有效（3）TREADY信号：从机告诉主机做好传输准备；（4）TDATA信号：数据，可选宽度32,64,128,256bit（5）TSTRB信号：每一bit对应TDATA的一个有效字节，宽度为TDATA/8（6）TLAST信号：主机告诉从机该次传输为突发传输的结尾；（7）TV ALID信号：主机告诉从机数据本次传输有效；（8）TUSER信号 ：用户定义信号，宽度为128bit。对于AXI4-Stream总线命名而言，除了总线时钟和总线复位，其他的信号线都是以T字母开头，后面跟上一个有意义的单词，看清这一点后，能帮助读者记忆每个信号线的意义。如TV ALID = T+单词Valid（有效），那么读者就应该立刻反应该信号的作用。每个信号的具体作用，在后面分析源码时再做分析
+===== PAGE 3 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+513
+23.2.2AXI接口介绍三种AXI接口分别是：AXI-GP接口（4个）：是通用的AXI接口，包括两个32位主设备接口和两个32位从设备接口，使用该接口可以访问PS中的片内外设。AXI-HP接口（4个）：是高性能/带宽的标准的接口，PL模块作为主设备连接（从下图中箭头可以看出）。主要用于PL访问PS上的存储器（DDR和On-Chip RAM）AXI-ACP接口 （1个） ： 是ARM多核架构下定义的一种接口， 中文翻译为加速器一致性端口， 用来管理DMA之类的不带缓存的AXI外设，PS端是Slave接口。我们可以双击查看ZYNQ Ultrascale+的IP核的内部配置， 就能发现上述的三种接口， 图中已用红色方框标记出来，我们可以清楚的看出接口连接与总线的走向：
+23.2.3AXI协议概述
+协议和总线关系密切，协议要在总线的结构上制定。虽然说AXI4，AXI4-Lite，AXI4-Stream都是AXI4协议，但是各自细节上还是不同的。总的来说，AXI总线协议的两端可以分为分为主 （master） 、 从 （slave） 两端， 他们之间一般需要通过一个AXIInterconnect相连接，作用是提供将一个或多个AXI主设备连接到一个或多个AXI从设备的一种交换机制。当我们添加了zynq以及带AXI的IP后再进行自动连线时，vivado会自动帮我们添加上这个IP，大家应该是不陌生了。AXI Interconnect的主要作用是， 当存在多个主机以及从机器时，AXI Interconnect负责将它们联系并管理起来。由于AXI支持乱序发送， 乱序发送需要主机的ID信号支撑， 而不同的主机发送的ID可能相同， 而AXI Interconnect解决了这一问题，他会对不同主机的ID信号进行处理让ID变得唯一。
+===== PAGE 4 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+514
+AXI协议将读地址通道，读数据通道，写地址通道，写数据通道，写响应通道分开，各自通道都有自己的握手协议。每个通道互不干扰却又彼此依赖。这也是AXI高效的原因之一。
+23.2.4AXI协议之握手协议
+AXI4所采用的是一种READY，V ALID握手通信机制，简单来说主从双方进行数据通信前，有一个握手的过程。传输源产生VLAID信号来指明何时数据或控制信息有效。而目地源产生READY信号来指明已经准备好接受数据或控制信息。 传输发生在V ALID和READY信号同时为高的时候。V ALID和READY信号的出现有三种关系。（1）V ALID先变高READY后变高。时序图如下：
+在箭头处信息传输发生。（2）READY先变高V ALID后变高。时序图如下：
+同样在箭头处信息传输发生。（3）V ALID和READY信号同时变高。时序图如下：
+===== PAGE 5 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+515
+在这种情况下，信息传输立马发生，如图箭头处指明信息传输发生。需要强调的是，AXI的五个通道， 每个通道都有握手机制， 接下来我们就来分析一下AXI-Lite的源码来更深入的了解AXI机制。23.2.5突发式读写1:突发式读的时序图如下：
+当地址出现在地址总线后，传输的数据将出现在读数据通道上。设备保持V ALID为低直到读数据有效。为了表明一次突发式读写的完成，设备用RLAST信号来表示最后一个被传输的数据。2:突发式写时序图如下：
+===== PAGE 6 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+516
+这一过程的开始时，主机发送地址和控制信息到写地址通道中，然后主机发送每一个写数据到写数据通道中。当主机发送最后一个数据时，WLAST信号就变为高。当设备接收完所有数据之后他将一个写响应发送回主机来表明写事务完成。23.4自定义AXI4-Lite IP CORE23.4.1AXI4-Lite源码查看建立一个自定义AXI-Lite的IP，查看AXI-Lite的源码。1：打开VIV ADO软件，新建一个工程。2：单击ToolsCreate and Package NEW IP。3：单击Next，选择Create a new AXI4 peripheral，单击Next。
+===== PAGE 7 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+517
+4： 输入要创建的IP名字， 此处命名为myip(名字尽量和最终自己的IP名字一致， 后面还可以修改)， 选择保存路径，单击Next。
+5：NameS00_AXI；Interface Type(接口类型)Lite；Data Width(Bits)(数据位宽)32位；Number of Registers(寄存器数量)4；单击next。
+6:选择Edit IP， 点击Finish按钮。 将打开一个编辑IP的工程。 以下图片中， 用户也可以选择Verify Peripheral IP usingAXI4 VIP,如果选择这个这个选型可以对IP做一个软件仿真。我们的视频教程中有这个步骤。
+===== PAGE 8 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+518
+7：此后，Vivado会新建一个工程，专门编辑该IP，通过该工程，就可以看到Vivado生成的AXI-Lite的操作源码。
+不过这个源码看起来不舒服， 一般我们很少对每个源码用版本命名， 所以本人喜欢修改下名字。 把源码修改后如下，当然源码的接口名字也要改下：
+然后重新添加进来，初学不会的读者可以打开我们源码对比下
+23.4.2AXI-Lite源码分析当打开顶层文件，即myip。首先看到的是一堆AXI端口信号，这些信号是否似曾相识？// Ports of Axi Slave Bus Interface S00_AXIinput wire s00_axi_aclk,input wire s00_axi_aresetn,input wire [C_S00_AXI_ADDR_WIDTH-1 : 0] s00_axi_awaddr,input wire [2 : 0] s00_axi_awprot,input wire s00_axi_awvalid,output wire s00_axi_awready,input wire [C_S00_AXI_DATA_WIDTH-1 : 0] s00_axi_wdata,input wire [(C_S00_AXI_DATA_WIDTH/8)-1 : 0] s00_axi_wstrb,input wire s00_axi_wvalid,output wire s00_axi_wready,output wire [1 : 0] s00_axi_bresp,output wire s00_axi_bvalid,input wire s00_axi_bready,input wire [C_S00_AXI_ADDR_WIDTH-1 : 0] s00_axi_araddr,input wire [2 : 0] s00_axi_arprot,input wire s00_axi_arvalid,
+===== PAGE 9 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+519
+output wire s00_axi_arready,output wire [C_S00_AXI_DATA_WIDTH-1 : 0] s00_axi_rdata,output wire [1 : 0] s00_axi_rresp,output wire s00_axi_rvalid,input wire s00_axi_rready没错笔者曾在《AXI总线概述》这节中提到了他们，这次通过源码分析再次隆重介绍它们。
+读通道
+地址通道 数据通道ARV ALID读地址有效。 此信号表明该信道此时能有效读出地址和控制信息 RV ALID读数据有效。 此信号表明该信道此时能有效读出数据ARADDR读地址RDA TA读数据
+ARREADY读地址准备好了。 该信号指示从器件准备好接受一个地址和相关联的控制信号RREADY读数据准备好了。 该信号指示从器件准备好接收数据
+ARPROT保护类型。 这个信号表示该事务的特权和安全级别， 并确定是否该事务是一个数据存取或指令的访问RRESP读取响应。 这个信号表明读事务处理的状态。
+写通道
+地址通道 数据通道 应答通道
+AWV ALID写地址有效。这个信号表示该主信令有效的写地址和控制信息。WVALID写有效。 这个信号表示有 效的 写 数 据和 选 通信号都可用。BV ALID写响应有效。此信号表明写命令的有效写入响应。
+AW ADDR写地址WDATA写数据BREADY响应准备。该信号指示在主主机可以接受一个响应信号
+AWREADY写地址准备好了。该信号指示从器件准备好接受一个地址和相关联的控制信号 WSTRB写选通。 这个信号表明该 字节 通 道 持有 效 数据 。 每 一bit对 应WDATA一个字节
+BRESP写响应。这个信号表示写事务处理的状态。
+AWPROT
+写通道保护类型。这个信号表示该事务的特权和安全级别，并确定是否该事务是一个数据存取或指令的访问
+WREADY写准备好了。 该信号指示 从器 件 可 以接 受 写数据。
+Vivado为我们生成的AXI-Lite的操作源码，是一个模板，我们只需要读懂它，然后稍加修改，就可以在实际工程使用。我们先来看一段源码中与WDATA相关的代码：always @( posedge S_AXI_ACLK )beginif ( S_AXI_ARESETN == 1'b0 )beginslv_reg0 <= 0;slv_reg1 <= 0;slv_reg2 <= 0;slv_reg3 <= 0;endelse beginif (slv_reg_wren)
+===== PAGE 10 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+520
+begincase ( axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )2'h0:for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )if ( S_AXI_WSTRB[byte_index] == 1 ) begin// Respective byte enables are asserted as per write strobes// Slave register 0slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];end2'h1:for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )if ( S_AXI_WSTRB[byte_index] == 1 ) begin// Respective byte enables are asserted as per write strobes// Slave register 1slv_reg1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];end2'h2:for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )if ( S_AXI_WSTRB[byte_index] == 1 ) begin// Respective byte enables are asserted as per write strobes// Slave register 2slv_reg2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];end2'h3:for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )if ( S_AXI_WSTRB[byte_index] == 1 ) begin// Respective byte enables are asserted as per write strobes// Slave register 3slv_reg3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];enddefault : beginslv_reg0 <= slv_reg0;slv_reg1 <= slv_reg1;slv_reg2 <= slv_reg2;slv_reg3 <= slv_reg3;endendcaseendendend这段程序的作用：当PS向AXI4-Lite总线写数据时，将从总线上传输过来的数据存储到寄存器slv_reg。而slv_reg寄存器有0~3共4个。至于赋值给哪一个由axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]决定，根据宏定义其实就是由axi_awaddr[3:2]（写地址中不仅包含地址，而且包含了控制位，这里的[3:2]就是控制位）决定赋值给哪个slv_reg。PS调用写函数时，如果不做地址偏移的话，axi_awaddr[3:2]的值默认是为0的，举个例子，如果我们自定义的IP的地址被映射为0x43C00000，那么我们Xil_Out32(0x43C00000,V alue)写的就是slv_reg0的值。如果地址偏移4位，如Xil_Out32(0x43C00000 + 4,Value)写的就是slv_reg1的值，依次类推。本例分析时只关注slv_reg0（其他几个寄存器结构相同，分析方法相同）：for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )if ( S_AXI_WSTRB[byte_index] == 1 ) beginslv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];end其 中 ，C_S_AXI_DATA_WIDTH的 宏 定 义 的 值 为32， 也 就 是 数 据 位 宽 ；S_AXI_WSTRB是 写 选 通 信 号 ，S_AXI_WDATA就是写数据信号。存在于for循环中的最关键的一句：
+===== PAGE 11 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+521
+slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];当byte_index = 0的时候这句话就等价于：slv_reg0[7:0] <= S_AXI_WDATA[7:0];当byte_index = 1的时候这句话就等价于：slv_reg0[15:8] <= S_AXI_WDATA[15:8];当byte_index = 2的时候这句话就等价于：slv_reg0[23:16] <= S_AXI_WDATA[23:16];当byte_index = 3的时候这句话就等价于：slv_reg0[31:24] <= S_AXI_WDATA[31:24];也就是说，只有当写选通信号为1时，它所对应S_AXI_WDATA的字节才会被读取。读懂了这段话之后，我们就知道了，如果我们想得到PS写到总线上的数据，我们只需要读取slv_reg0的值即可。那么如果，我们想写数据到总线让PS读取该数据，我们该怎么做呢？我们继续来看有关RADTA读数据代码：// Output register or memory read dataalways @( posedge S_AXI_ACLK )beginif ( S_AXI_ARESETN == 1'b0 )beginaxi_rdata <= 0;endelsebegin// When there is a valid read address (S_AXI_ARV ALID) with// acceptance of read address by the slave (axi_arready),// output the read dadaif (slv_reg_rden)beginaxi_rdata <= reg_data_out; // register read dataendendend观察可知，当PS读取数据时，程序会把reg_data_out复制给axi_rdata（RADTA读数据）。我们继续追踪reg_data_out：always @(*)begin// Address decoding for reading registerscase ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )2'h0 : reg_data_out <= slv_reg0;2'h1 : reg_data_out <= slv_reg1;2'h2 : reg_data_out <= slv_reg2;2'h3 : reg_data_out <= slv_reg3;default : reg_data_out <= 0;endcaseend和前面分析的一样此时通过判断axi_awaddr[3:2]的值来判断将那个值给reg_data_out上， 同样当PS调用读取函数时， 这里axi_awaddr[3:2]默认是0， 所以我们只需要把slv_reg0替换成我们自己数据， 就可以让PS通过总线读到我们提供的数据。这里可能有的读者会问了，slv_reg0不是总线写过来的数据吗？因为笔者说过这个程序是Vivado为我们提供的例子，它这么做无非是想验证写出去的值和读进入的值相等。但是他怎么写确实会对初看代码的人造成困扰。最后笔者提出一个问题，为什么写通道要比读通道多了一列应答通道，这是为什么呢？首先，你要知道这个应答信号是干什么用的？
+===== PAGE 12 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+522
+写应答，主要是回复主机你这个写过程是没有问题的，那读为什么不需要这个过程呢？
+这时因为主机在读取数据时，从机可以直接通过读数据通道给主机反馈信息，因此就没有必要再来开辟一个单独的应答通道了。小结：如果我们想读AXI4_Lite总线上的数据时，只需关注slv_reg的数据，我们可自行添加一段代码，如：reg [11:0]rlcd_rgb;always @( posedge S_AXI_ACLK )beginif ( S_AXI_ARESETN == 1'b0 )beginrlcd_rgb <= 12'd0;endelsebeginrlcd_rgb <= slv_reg0[11:0];endendassign lcd_rgb = rlcd_rgb;如果我们想对AXI4_Lite信号写数据时，我们只需修改对reg_data_out的赋值，如：//写总线测试修改！！！！！！！！！wire[31:0]wlcd_xy;// = {10'd0,lcd_xy};assign wlcd_xy = {10'd0,lcd_xy};assign slv_reg_rden = axi_arready & S_AXI_ARV ALID & ~axi_rvalid;always @(*)begin// Address decoding for reading registerscase ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )2'h0 : reg_data_out <= wlcd_xy;//slv_reg0;2'h1 : reg_data_out <= slv_reg1;2'h2 : reg_data_out <= slv_reg2;2'h3 : reg_data_out <= slv_reg3;default : reg_data_out <= 0;endcase
+===== PAGE 13 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+523
+end23.4.3打包成图形IP可以根据自己源码的修改指定版本号
+一般我们设置兼容VIVADO支持的芯片的所有系列
+文件类型
+用户自定义参数
+===== PAGE 14 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+524
+可以观察下自动识别的信号，以及信号类型
+地址设置，一般用不到
+这个页面可以定制GUI目前这个IP用默认的就可以
+
+===== PAGE 15 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+525
+单击Re-Package IP重新打包IP
+23.5硬件电路分析
+23.6搭建SOC系统工程详细的搭建过程这里不再重复，对于初学读者如果还不清楚如何创建SOC工程的，请学习“01Vitis Soc开发入门”这篇文章。
+===== PAGE 16 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+526
+23.6.1SOC系统工程
+1:本实验可以不设置中断
+2:GP Master
+===== PAGE 17 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+527
+3:
+4:PL
+
+===== PAGE 18 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+528
+5:IP设置自定义IP路径，并且添加IP
+6:ILA右击需要添加ILA在下逻辑分析仪的总线,选择Debug
+根据提示选择自动连线
+===== PAGE 19 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+529
+23.6.2设置AXI外设地址分配只要添加的AXI总线外设都要正确分配地址,这一步不能遗漏
+===== PAGE 20 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+530
+23.6.3编译并导出平台文件以下步骤简写，有不清楚的看第一篇文章。1:单击Block文件右键Generate the Output ProductsGlobalGenerate。2:单 击Block文 件右 键Create a HDL wrapper(生 成HDL顶 层 文 件)Let vivado manager wrapper andauto-update(自动更新)。3:添加配套工程路径下uisrc/04_pin/fpga_pin.xdc约束文件4:生成Bit文件。5:导出到硬件: FileExport HardwareInclude bitstream6:导出完成后，对应工程路径的soc_hw路径下有硬件平台文件：system_wrapper.xsa的文件。根据硬件平台文件system_wrapper.xsa来创建需要Platform平台。
+23.7搭建Vitis-sdk工程创建soc_base sdk platform和APP工程的过程不再重复，如果不清楚请参考本章节第一个demo。23.7.1创建SDK Platform工程
+
+===== PAGE 21 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+531
+右击soc_base编译，编译的时间可能会有点长23.7.2创建APP工程
+23.8程序分析本程序非常简单，直接时对地址空间的操作。写函数：void Xil_Out32(UINTPTR Addr, u32 Value)定义：
+读函数：u32 Xil_In32(UINTPTR Addr)
+23.8.1硬件准备本实验需要用到JTAG下载器、USB转串口外设，另外需要把2P设置到JTAG模式，即ON ON(注意新版本的米联客7x，支持JTAG模式，对于老版本的核心板，JTAG调试的时候一定要拔掉TF卡，并且设置模式开关为OFF OFF)
+
+===== PAGE 22 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+532
+23.8.2实验结果为了观察到PL部分的在线逻辑分析仪抓取的AXI-LITE总线波形数据，双击代码处，设置断点。程序为了方观察，特意增加了i=0的赋值处设置断电。
+设置好后启动SDK调试,当程序暂停再mian函数入口时回到VIV ADO界面，单击Open Hardware ManagerOpenTarget->Auto Connect，这样一般就能识别到ila IP
+ILA IP的调试信号识别后，加载完成后的界面
+Trigger Setup,点击“+”，选择AXI_WV ALID，AXI_RREADY ,关系设置OR，触发条件Value为1。
+设置触发位置为50
+===== PAGE 23 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+533
+单击运行按钮，启动触发。
+进入等待触发状态
+单击Vitis IDE中的运行按钮
+后，VIV ADO中HW_ILA2窗口采集到波形输出， 可以看到AXI总线的工作时序。Vitis IDE中mian.c程序功能是向AXI4总线写入1~4，再从AXI4总线读数据，从上面对未修改直接封装的IP分析，可以，读出的数据应等于写入的数据。从波形图可以看出，写入的数据是1、2、3、4，对应基地址的偏移地址是0、4、8、12。
+===== PAGE 24 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+534
+再看读出的数据,读的操作间隔比较大我们这里观察到读寄存器1的输出值。
+在Vitis IDE中打开串口，可以看到串口在打印从AXI4总线读出的数据，分别是1、2、3、4。写入数据与读出数据一致。这样我们完成了对AXI4-lite总线接口的IP的读写测试。
+===== PAGE 25 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+535

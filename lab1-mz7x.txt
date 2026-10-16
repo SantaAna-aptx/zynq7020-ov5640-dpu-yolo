@@ -1,0 +1,198 @@
+===== PAGE 1 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+14
+01Vitis Soc开发入门软件版本：vitis2021.1(vivado2021.1)操作系统：WIN10 64bit硬件平台：适用XILINX A7/K7/Z7/ZU/KU系列FPGA登录“米联客”FPGA社区-www.uisrc.com视频课程、答疑解惑！
+1.1概述本实验是我们开始XILINX ZYNQ SOC的第一个入门demo。实验目的：1:掌握基于vitis-vivado创建SOC工程2:掌握基于图形化Block Design的设计方法3:掌握ZYNQ IP核的调用4:掌握ZYNQ IP核的参数配置方法5:掌握生成一个基于ZYNQ IP核的最小系统方法6:导出硬件参数xsa文件7:使用vitis-sdk创建sdk base工程8:使用vitis-sdk创建自带sdk helloworld APP工程10:使用vitis-sdk创建以太网测试程序
+1.2系统框图本方案构建基于ZYNQ IP核的最小系统，包含了PS DDR、FLASH、EMMC、TF-Card、Uart、USB、ETH以太网
+1.3搭建SOC系统工程Vitis-vivado和其他版本的vivado使用方法基本一致，只有最后导出的xsa文件是vitis才有的文件格式。对于初学者，请认真学习以下每一个步骤。1.3.1创建soc_prj工程1:米联客新版本资料里面SOC工程一级目录一般包含3个文件夹，用于管理各类文件：soc_hw:文件夹放system.xsa文件soc_prj:文件夹放FPGA工程
+===== PAGE 2 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+15
+soc_sdk:文件夹放SDK相关的开发文件
+2:vivado
+3:soc由于已经创建好了路径，所以不需要让软件再次创建以工程命名的路径
+
+===== PAGE 3 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+16
+这一步选择芯片型号，一定要选择和自己开发板相匹配的型号（本实验使用的开发平台是米联客7x对应的芯片型号为xc7z020clg400-2）
+
+===== PAGE 4 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+17
+1.3.2创建BD图形化模块1:BD
+米联客的BD统一命名为system
+单击“+”号
+===== PAGE 5 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+18
+双击ZYNQ7 Processing System
+2:ZYNQ IP双击IP对IP的各个功能参数进行配置， 这个配置必须参考硬件原理图完成， 所以FPGA或者SOC工程师必须具备一定的硬件分析能力，可以阅读原理图，实现对硬件资料在软件上的定义分配。
+这里我们使用已经提供的配置文件对参数进行位置。
+===== PAGE 6 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+19
+在本demo配套工程的uisrc/06/doc路径下，提供了配置参数
+等待配置完成即可
+
+===== PAGE 7 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+20
+1.3.3ZYNQ IP的配置参数以上通过已经提供的配置参数，快速完成了IP的基本配置。这个过程在后续的demo中不再重复，后续demo会对用到的资源说明分析，或对IP部分功能重新配置。以下我们针对主要的外设资源对IP的配置说明。1:MIOBANKMZ7020核心板的MIO BANK0对应核心板硬件原理图上的BANK500设置3.3V , MIO BANK1对应核心板硬件原理图上的BANK501设置1.8V
+2:MIO2-1:QSPI-FLASH
+2-2:PS
+
+===== PAGE 8 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+21
+2-3:USB
+2-4:SDIO0-EMMC
+2-5:SDIO1-SD
+2-6:1
+2-7:IOIO
+
+===== PAGE 9 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+22
+2-8:DDR
+2-9:
+相关PL的设置本demo没有用到，后面相关demo用到的时候再进行配置1.3.4ZYNQ IP的配置参数保存对于配置好的参数可以保存下来，方便后面新建工程使用，减少重复步骤
+
+===== PAGE 10 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+23
+1.3.5自动连线完成配置后，可以自动连线，让软件自动引出接口
+这里需要注意：VIV ADO的自动化连线可以完成一些简单的信号连线设计，前提是开发者必须知道原理，否则自动连线可能会导致错误。1.3.6检验BD工程通过Validate Design可以快速初步排查BD工程是否有错误
+
+===== PAGE 11 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+24
+1.3.7地址空间分配由于没有使用任何PL资源，本demo中不需要分配地址
+1.3.8编译并导出平台文件1:单击Block文件右键Generate the Output ProductsGlobalGenerate。
+
+===== PAGE 12 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+25
+2:单 击Block文 件右 键Create a HDL wrapper(生 成HDL顶 层 文 件)Let vivado manager wrapper andauto-update(自动更新)。右击system.bd创建Create HDL Wrapper
+该文件就是一个FPGA Verilog文件。而BD图形化工程，VIVADO把BD封装成了一个模块。顶层的verilog文件通过模块接口就可以调用BD图形代码了。
+
+===== PAGE 13 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+26
+3:添加fpga_pin.xdc文件该文件主要是对bit设置压缩，减少bit的大小
+这个文件用户可以自己创建，也可以选择uisrc/04_pin路径下已经提供的fpga_pin.xdc文件
+
+===== PAGE 14 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+27
+4:生成Bit文件。
+单击Cancel
+5:导出到硬件: FileExport HardwareInclude bitstream
+
+===== PAGE 15 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+28
+6:导出完成后，对应工程路径的soc_hw路径下有硬件平台文件：system_wrapper.xsa的文件。根据硬件平台文件system_wrapper.xsa来创建需要Platform平台。
+1.4搭建Vitis-sdk工程创建soc_base sdk platform和APP工程。
+===== PAGE 16 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+29
+1.4.1创建SDK Platform工程启动Vitis-Sdk
+设置好路径
+米联客资料中的路径规范如下图：soc_prj里面是基于SOC的硬件工程源码soc_hw里面是xsa格式文件，soc_prj编译会导出system_wrapper.xsa到这个文件soc_sdk里面是裸机的sdk工程，sdk工程创建依赖soc_hw中的system_wrapper.xsa
+单击Create Platform Project创建基于开发平台的工程
+
+===== PAGE 17 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+30
+添加之前创建的system_wrapper.xsa文件
+创建完成后
+===== PAGE 18 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+31
+LWIP库的修改：1：ZU系以及米联客7x开发板列网口芯片是工业级RTL8211FDI（商业级为RTL8211FD），由于默认的驱动不支持,需要手动自己修改库文件。我们这里已经提供了修改好的库，解压到vivado的安装路径下的对于路径下：
+修改好后，需要关闭vitis-sdk然后重新打开sdk，否则无法识别修改的库2：为了创建lwip工程需要先对zu_base中的board support package简称bsp设置lwip库的支持
+===== PAGE 19 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+32
+3：对lwip库参数修改以达到最佳性能。本例程使用RAW API， 即函数调用不依赖操作系统。 传输效率也比SOCKET API高，(具体可参考xapp1026)。将use_axieth_on_zynq和use_emaclite_on_zynq设为0。如下图所示。
+修改lwip_memory_options设置，将mem_size，memp_n_pbuf，mem_n_tcp_pcb，memp_n_tcp_seg这4个参数 值设大，这样会提高TCP传输效率。如下图所示。
+修改pbuf_options设置，将pbuf_pool_size设大，增加可用的pbuf数量，这样同样会提高TCP传输效率。如下 图所示。
+修改tcp_options设置，将tcp_snd_buf，tcp_wnd参数设大，这样同样会提高TCP传输效率。如下图所示。
+修改temac_adapter_options设置，将n_rx_descriptors和n_tx_descriptors参数设大。这样可以提高zynq内部emac dma的数据迁移效率，同样能提高TCP传输效率。如下图所示。
+===== PAGE 20 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+33
+最后，右击soc_base完成编译
+1.4.2创建hello_world APP工程
+
+===== PAGE 21 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+34
+
+===== PAGE 22 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+35
+可以看到，工程模板包括：1-空的C或者C++工程2-Hello World测试工程3-lwip echo Server工程4-lwip TCP Perf Client TCP性能测试等等….我们开发的SDK应用方案大多都基于XILINX SDK模板来实现，本方案通过模板创建要给HelloWorld工程
+第一种编译方法，右击编译只产生elf文件
+===== PAGE 23 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+36
+第二种编译方法，右击编译可以产生elf文件，和BOOT.BIN文件，但是时间较长一些
+
+===== PAGE 24 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+37
+1.4.3以太网测试1:lwip echo APP用同样的方法创建lwip_echo_server
+2:lwip_tcp_perf_client APP
+
+===== PAGE 25 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+38
+1.5程序分析
+hello_word APP就是简单通过串口输出一些字符信息，本文重点演示软件使用方法，程序代码不做分析，后面SDK高级篇到以太网部分，用到相关功能再分析代码。1.6方案演示1.6.1硬件准备本实验需要用到JTAG下载器、USB转串口外设，另外需要把2P设置到JTAG模式，即ON ON(注意新版本的米联客7x，支持JTAG模式，对于老版本的核心板，JTAG调试的时候一定要拔掉TF卡，并且设置模式开关为OFF OFF)
+1.6.2hello_world实验结果为了观察实现结果，需要打开串口
+===== PAGE 26 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+39
+如果不清楚串口号的，可以查看下设备管理器,如果发现没装串口驱动的安装上驱动
+选中hello_world APP并且右击，然后单击Debug As->Debug Configuration
+===== PAGE 27 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+40
+双击Single Application Debug，之后选Debug
+程序运行停在debug入口，单击
+运行
+输出打印结果
+===== PAGE 28 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+41
+1.6.3以太网测试1:lwip_echo_server APP给开发板通电，连接网口， 并且根据以下步骤，设置电脑端IP地址
+
+===== PAGE 29 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+42
+调试程序
+===== PAGE 30 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+43
+打开网络调试助手，并且设置如下
+单击发送数据
+===== PAGE 31 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+44
+2:lwip_tcp_perf_server APP给开发板通电，连接网口， 并且根据以下步骤，设置电脑端IP地址
+
+===== PAGE 32 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+45
+
+===== PAGE 33 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+46
+打开网络调试助手,设置接收数据不显示，否则速度太快会卡死
+调试程序
+
+===== PAGE 34 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+47

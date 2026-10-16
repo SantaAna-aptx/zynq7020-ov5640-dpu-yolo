@@ -1,0 +1,65 @@
+===== PAGE 1 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+424
+18PL AXI-GPIO实验软件版本：vitis2021.1(vivado2021.1)操作系统：WIN10 64bit硬件平台：适用XILINX A7/K7/Z7/ZU/KU系列FPGA登录“米联客”FPGA社区-www.uisrc.com视频课程、答疑解惑！
+18.1概述本文介绍VIV ADO自带IP AXI-GPIO扩展PS IO的使用。 我们在前面的文章中通过EMIO实现过扩展PS的IO，通过EMIO的方式实际上IO控制器还是用PS的。那么AXI-GPIO更多是使用FPGA资源实现的IO的扩展。并且很多应用中，我们会把AXI-GPIO的控制信号用于FPGA内部逻辑和PS之间的数据交互，比如通过AXI-GPIO输出复位信号，或者通过AXI-GPIO的输入中断，扩展出更多中断。在本文的demo中， 我们将实现通过AXI-GPIO扩展2个IO实现LED驱动， 以及2个IO实现按键输入， 并且通过按键输入产生2个GPIO中断。本文实验目的：1:通过阅读pg144-axi-gpio.pdf熟悉AXI-GPIO的硬件资源(配套工程的zu_prj/06_doc路径)2:通过VIVADO搭建AXI-GPIO的SOC工程,通过按键模拟输入、LED模拟输出3:使用VITIS-SDK编写AXI-GPIO测试程序，完成GPIO输入、输入中断、输出测试18.2系统框图
+18.3AXI-GPIO IP概述AXI-GPIO IP通过AXI-Lite-slave连接到PS。 具体2个通道， 每个通道32个GPIO。 在IP里面可以固定配置为输入或者输出，也可以通过软件控制寄存器配置为输入或者输出。并且支持中断输入，AXI-GPIO的构架如下图所示。
+===== PAGE 2 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+425
+18.3.1特性-支持axis4 - lite接口规范-支持可配置的单或双GPIO通道-支持GPIO引脚1 ~ 32位的通道宽度配置-支持动态规划每个GPIO位作为输入或输出-支持每个通道的单独配置-支持所有寄存器的每个位的独立重置值-支持可选的中断请求生成18.3.2寄存器说明1:GPIOx_DATA有两个GPIO数据寄存器(GPIO_DATA和GPIO2_DATA)， 每个通道对应一个。 通道1数据寄存器(GPIO_DATA)始终存在;通道2数据寄存器(GPIO2_DATA)只有当IP配置为双通道(Enable dual channel = 1)时才存在。
+
+===== PAGE 3 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+426
+2:GPIOx_TRI有两个AXI GPIO 3-state控制寄存器(GPIO_TRI和GPIO2_TRI)， 每个通道对应一个。 通道2 3状态控制寄存器(GPIO2_TRI)只有在IP配置为双通道使能双通道= 1时才存在。
+3:(GIER)设置31bit位为1使能中断。
+4:IP-CORE(IPIER)
+
+===== PAGE 4 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+427
+5:IP(IPISR)
+18.4硬件电路分析
+这里使用按键输入BTN1和BTN2,配套工程的FPGA PIN脚定义路径为soc_prj/uisrc/04_pin/ fpga_pin.xdc。18.5搭建SOC系统工程详细的搭建过程这里不再重复，对于初学读者如果还不清楚如何创建SOC工程的，请学习“01Vitis Soc开发入门”这篇文章。
+===== PAGE 5 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+428
+18.5.1SOC系统工程
+1:
+2:GP Master
+===== PAGE 6 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+429
+3:
+4:PL
+
+===== PAGE 7 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+430
+5:AXI-GPIO输出输出各设置2bit,支持中断
+18.5.2设置AXI外设地址分配从本节课开始，只要添加的AXI总线外设都要正确分配地址
+18.5.3编译并导出平台文件以下步骤简写，有不清楚的看第一篇文章。1:单击Block文件右键Generate the Output ProductsGlobalGenerate。2:单 击Block文 件右 键Create a HDL wrapper(生 成HDL顶 层 文 件)Let vivado manager wrapper andauto-update(自动更新)。3:添加配套工程路径下uisrc/04_pin/fpga_pin.xdc约束文件4:生成Bit文件。5:导出到硬件: FileExport HardwareInclude bitstream6:导出完成后，对应工程路径的soc_hw路径下有硬件平台文件：system_wrapper.xsa的文件。根据硬件平台文件system_wrapper.xsa来创建需要Platform平台。
+
+===== PAGE 8 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+431
+18.6搭建Vitis-sdk工程创建soc_base sdk platform和APP工程的过程不再重复，如果不清楚请参考本章节第一个demo。18.6.1创建SDK Platform工程
+右击soc_base编译，编译的时间可能会有点长18.6.2创建APP工程
+18.7程序分析在前面文章文章中，我们已经使用过PS的中断，比如GPIO中断、定时器中断、看门狗中断、I2C中断等等。其中关于sys_intr.c中的函数都做了详细介绍。所以本文开始不再介绍sys_intr.c中的函数。
+===== PAGE 9 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+432
+18.7.1axi_gpio_test.c测试程序
+#include"sys_intr.h"#include"axi_gpio_intr.h"#include"sleep.h"voidinit_intr_sys(void){Gpiopl_init(&Gpio, AXI_GPIO_DEV_ID);Init_Intr_System(&Intc);Gpiopl_Setup_Intr_System(&Intc, &Gpio, GPIO_INTR_ID);Setup_Intr_Exception(&Intc);}intmain(void){init_intr_sys();while(1){if(gpio_intr_flag){gpio_intr_flag = 0;XGpio_DiscreteWrite(&Gpio,2,gpio_val);printf("SW=%d int\n\r", gpio_val);}}returnXST_SUCCESS;}18.7.2axi_gpio_intr.c程序#include"axi_gpio_intr.h"volatileu32gpio_intr_flag;volatileu32gpio_val;voidGpioplIntrHandler(void*Callback){XGpio*GpioPtr = (XGpio*)Callback;u32IrqStatus;IrqStatus = XGpio_InterruptGetStatus(GpioPtr);if((IrqStatus & 0x01) == 0x01){gpio_val = XGpio_DiscreteRead(GpioPtr, 1);gpio_intr_flag = 1;}XGpio_InterruptClear(GpioPtr, IrqStatus);}voidGpiopl_Setup_Intr_System(XScuGic*GicInstancePtr,XGpio*InstancePtr,u16IntrId)
+===== PAGE 10 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+433
+{XScuGic_Connect(GicInstancePtr, IntrId,(Xil_ExceptionHandler)GpioplIntrHandler,(void*)InstancePtr);XScuGic_Enable(GicInstancePtr, IntrId);//enable the interrupt for the Timer at GICXGpio_InterruptEnable(InstancePtr, 0x01);//enable channel 1 interruptXGpio_InterruptGlobalEnable(InstancePtr);}intGpiopl_init(XGpio*InstancePtr,u32DeviceId){intStatus;/* Initialize AXI GPIO */Status = XGpio_Initialize(InstancePtr, DeviceId);if(Status != XST_SUCCESS) {xil_printf("AXI GPIO configfailed!\r\n");returnXST_FAILURE;}XGpio_SetDataDirection(InstancePtr, 1, 0x3);//channel 1 2bits inputXGpio_SetDataDirection(InstancePtr, 2, 0x0);//channel 2 2bit outputreturn1;}在初始化函数中，设置channel1的2个IO为输入，channel2的2个IO为输出
+在Gpiopl_Setup_Intr_System(XScuGic *GicInstancePtr, XGpio *InstancePtr, u16 IntrId)函 数 中 主 要 是 对 ，AXI-GPIO的全局中断使能寄存器GIER和IPIER中断使能寄存器进行设置
+当GPIO的电平状态发生改变就会触发中断，回调函数中，首先读取AXI-GPIO的状态寄存器，然后判断是否是channel1产生的中断。之后读取GPIO的按键输入状态，设置中断触发变量为1。最后清除中断。
+===== PAGE 11 =====
+MILIANKEwww.uisrc.com www.milianke.com ZYNQ SOC SDK Start Course (2022)
+434
+18.8方案演示18.8.1硬件准备本实验需要用到JTAG下载器、USB转串口外设，另外需要把2P设置到JTAG模式，即ON ON(注意新版本的米联客7x，支持JTAG模式，对于老版本的核心板，JTAG调试的时候一定要拔掉TF卡，并且设置模式开关为OFF OFF)
+18.8.2实验结果除了通过串口观察按键中断的结果，而且可以通过LED观察。每次按下按键产生一个中断，每次松开按键也会产生一个中断。总之，只要按键的状态发生改变就会产生中断。

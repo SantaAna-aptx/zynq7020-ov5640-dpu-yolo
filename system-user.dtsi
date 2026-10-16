@@ -1,0 +1,27 @@
+/include/ "system-conf.dtsi"
+/ {
+    /* 显式 bootargs：修复 DTG 生成空 bootargs / 坏 stdout-path 的问题 */
+    chosen {
+        bootargs = "console=ttyPS0,115200 earlycon=uart8250,mmio32,0xE0001000 root=/dev/mmcblk0p2 rw rootwait earlyprintk cma=256M";
+        stdout-path = "serial0:115200n8";
+    };
+
+    /* xlnk：DNNDK 的 CMA 内存管理节点 */
+    xlnk {
+        compatible = "xlnx,xlnk-1.0";
+    };
+
+    /* DPU：dpu.ko 通过 compatible 匹配。
+       ★ 基地址 0x40000000 来自本项目 hwh 的 MEMORYMAP（dpu_eu_0 reg0 on M_AXI_GP0）
+       ★ 中断：dpu_interrupt -> IRQ_F2P[0]（GIC SPI 61 -> DT 29） */
+    dpu@0x40000000 {
+        compatible = "xilinx,dpu";
+        base-addr = <0x40000000>;
+        dpucore {
+            compatible = "xilinx,dpucore";
+            interrupt-parent = <&intc>;
+            interrupts = <0 29 4>;
+            core-num = <0x1>;
+        };
+    };
+};

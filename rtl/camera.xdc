@@ -1,0 +1,25 @@
+# camera.xdc — OV5640 (VIP 20P) 接 MZQ7X CEP J5，bank35 LVCMOS33
+# 引脚依据：MZQ7X 硬件手册 图5-15-1 CEP 管脚定义 + VIP_Sensor_OV5640_SCH.pdf
+set_property -dict {PACKAGE_PIN F19 IOSTANDARD LVCMOS33 PULLUP true} [get_ports cmos_scl]
+set_property -dict {PACKAGE_PIN F20 IOSTANDARD LVCMOS33 PULLUP true} [get_ports cmos_sda]
+set_property -dict {PACKAGE_PIN C20 IOSTANDARD LVCMOS33 PULLUP true} [get_ports cmos_vsync]
+set_property -dict {PACKAGE_PIN B20 IOSTANDARD LVCMOS33 PULLUP true} [get_ports cmos_href]
+set_property -dict {PACKAGE_PIN D19 IOSTANDARD LVCMOS33} [get_ports cmos_pclk]
+set_property -dict {PACKAGE_PIN D20 IOSTANDARD LVCMOS33 DRIVE 8 SLEW fast} [get_ports cmos_xclk]
+set_property -dict {PACKAGE_PIN F16 IOSTANDARD LVCMOS33} [get_ports {cmos_data[7]}]
+set_property -dict {PACKAGE_PIN F17 IOSTANDARD LVCMOS33} [get_ports {cmos_data[6]}]
+set_property -dict {PACKAGE_PIN E18 IOSTANDARD LVCMOS33} [get_ports {cmos_data[5]}]
+set_property -dict {PACKAGE_PIN E19 IOSTANDARD LVCMOS33} [get_ports {cmos_data[4]}]
+set_property -dict {PACKAGE_PIN E17 IOSTANDARD LVCMOS33} [get_ports {cmos_data[3]}]
+set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports {cmos_data[2]}]
+set_property -dict {PACKAGE_PIN B19 IOSTANDARD LVCMOS33} [get_ports {cmos_data[1]}]
+set_property -dict {PACKAGE_PIN A20 IOSTANDARD LVCMOS33} [get_ports {cmos_data[0]}]
+# 时序：XCLK 输出 24MHz（由 ACLK 100M 经 MMCM 分频，BD 内部时钟，无需外部约束）
+create_clock -period 41.666 -name cmos_pclk_clk [get_ports cmos_pclk]
+set_input_delay -clock cmos_pclk_clk -max 3.0 [get_ports {cmos_data[*]}]
+set_input_delay -clock cmos_pclk_clk -min 1.0 [get_ports {cmos_data[*]}]
+set_input_delay -clock cmos_pclk_clk -max 3.0 [get_ports cmos_pclk]
+set_input_delay -clock cmos_pclk_clk -min 1.0 [get_ports cmos_pclk]
+set_false_path -from [get_ports {cmos_vsync cmos_href}]
+
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets cmos_pclk_IBUF]

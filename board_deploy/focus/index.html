@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>摄像头实时预览 — 对焦与色彩</title>
+<!-- The page reloads itself every few seconds; latest.png is overwritten in place by
+     live_focus.ps1, so nothing accumulates on disk. -->
+<meta http-equiv="refresh" content="5">
+<style>
+  html,body { margin:0; background:#111; color:#eee; font-family:Consolas,monospace; }
+  .bar { padding:10px 14px; font-size:15px; background:#1c1c1c; border-bottom:1px solid #333;
+         display:flex; gap:24px; align-items:baseline; flex-wrap:wrap; }
+  .big { font-size:22px; font-weight:bold; color:#5fd; }
+  .dim { color:#888; font-size:13px; }
+  img  { display:block; width:100%; max-width:1025px; margin:14px auto; }
+  .hint { color:#888; font-size:13px; text-align:center; padding:6px 0 18px; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span id="state" style="font-weight:bold">--</span>
+    <span>清晰度 SCORE <span class="big" id="s">--</span></span>
+    <span>最佳 <span class="big" id="b">--</span></span>
+    <span id="t">--</span>
+  </div>
+  <img id="im" src="latest.png" alt="waiting for the first frame...">
+  <div class="hint">
+    转动焦距轴让 SCORE 尽量变大 · 页面每 5 秒自动刷新 · 不保存历史图片，只覆盖一张 latest.png
+  </div>
+<script src="status.js"></script>
+<script>
+  // bust the cache so the browser always shows the newest render
+  var im = document.getElementById('im');
+  im.src = 'latest.png?t=' + Date.now();
+  var st = document.getElementById('state');
+  if (window.FOCUS) {
+    document.getElementById('s').textContent = window.FOCUS.score.toFixed(1);
+    document.getElementById('b').textContent = window.FOCUS.best.toFixed(1);
+    document.getElementById('t').textContent = window.FOCUS.at;
+    if (window.FOCUS.paused) {
+      st.textContent = '⏸ 已暂停（不采集、不写盘）';
+      st.style.color = '#fa4';
+    } else {
+      st.textContent = '● 运行中';
+      st.style.color = '#5fd';
+    }
+  } else {
+    st.textContent = '?? 无状态信息';
+  }
+</script>
+</body>
+</html>

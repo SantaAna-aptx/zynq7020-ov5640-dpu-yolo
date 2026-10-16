@@ -1,0 +1,200 @@
+# =============================================================================
+#  .gitignore
+#
+#  这个仓库只收录源码 / 配置 / 文档 / 模型段；所有可从它们重建的产物都不入库。
+#  原始工作目录有 3.17 GB（含 1.4 GB 系统镜像、约 400 MB Vivado 构建产物、
+#  493 个日志、约 200 个历史调试脚本），筛到 21 MB 后才适合放上 Git。
+#
+#  启用方式：直接用 .gitignore 会漏（黑名单必须完备才安全），所以首次提交是用
+#  显式白名单 git add 的；本文件负责挡住以后误加的产物。
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 凭据 —— 永远不要提交
+# -----------------------------------------------------------------------------
+board_deploy/board_key
+board_deploy/board_key.pub
+board_deploy/passwd_set.py
+board_deploy/passwd_set.log
+*.pem
+*.p12
+*.ppk
+id_rsa*
+id_ed25519*
+
+# -----------------------------------------------------------------------------
+# 大文件 / 磁盘镜像（GitHub 单文件硬限 100 MB）
+# -----------------------------------------------------------------------------
+*.ext4
+*.img
+*.bit
+*.iso
+*.vmdk
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+rootfs*
+sdboot*
+BOOT.BIN
+image.ub
+BOOT_NEW.BIN
+BOOT_ORIG.BIN
+
+# -----------------------------------------------------------------------------
+# Vivado 构建产物（都可由源码重建）
+# -----------------------------------------------------------------------------
+*.dcp
+*.rpt
+*.jou
+*.pb
+*.str
+*.log
+*.xpr.bak
+**/.runs/
+**/.cache/
+**/.hw/
+**/.sim/
+**/.Xil/
+**/ipshared/
+**/*ip_user_files/
+**/hw_handoff/
+**/*_rfs.v
+**/*_rfs.vhd
+**/*_sim_netlist.v
+**/*_sim_netlist.vhdl
+**/*_stub.v
+**/*_stub.vhdl
+**/ps7_init*
+**/*.gen/
+
+# -----------------------------------------------------------------------------
+# Vivado xsim 仿真产物（大量散落在 rtl/ 下）
+# -----------------------------------------------------------------------------
+rtl/xsim*
+rtl/xelab*
+rtl/xvlog*
+rtl/usage_statistics*
+rtl/webtalk*
+rtl/Compile_Options.txt
+rtl/work.rlx
+rtl/*.wdb
+rtl/*.sdb
+rtl/*.skip130
+rtl/*.bak
+rtl/*.bak2
+rtl/.xsim_webtallk.info
+xsim*
+xelab*
+xvlog*
+usage_statistics*
+
+# -----------------------------------------------------------------------------
+# 第三方 SDK / 参考设计（不是本项目的产物，也不宜再分发）
+# -----------------------------------------------------------------------------
+dnndk_v3.1/
+dpu_trd/
+sdcard/
+web/
+bd_probe/
+soc_prj.gen/
+vivado_session/
+petalinux_projects/
+
+# Xilinx 专有 IP 源码（CONFIDENTIAL IN CONFIDENCE），连同探测工程一起排除
+probe_src/
+
+# -----------------------------------------------------------------------------
+# board_deploy 下的过程产物
+# -----------------------------------------------------------------------------
+board_deploy/backup/
+board_deploy/sysroot_arm/
+board_deploy/sd_delivery/
+board_deploy/diag2_prj/
+board_deploy/probe_prj/
+board_deploy/*.log
+board_deploy/*.bin
+board_deploy/*.bit
+board_deploy/*.raw
+board_deploy/*.jpg
+board_deploy/*.png
+board_deploy/*.elf
+board_deploy/*.bak
+board_deploy/design_1_bd_before_*.bak
+board_deploy/cam_stream
+board_deploy/deephi_tiny_yolo.o
+board_deploy/tiny_yolo_image_diag4
+board_deploy/*.tgz
+
+# -----------------------------------------------------------------------------
+# 项目根目录的历史调试脚本（一次性探测脚本，不属于项目）
+# -----------------------------------------------------------------------------
+/peek_*
+/phase*
+/probe*
+/vm_*
+/sd_*
+/fclk_*
+/audit*
+/check_*
+/listen*
+/kill_*
+/full_auto*
+/final_*
+/fix_*
+/extract_*
+/collect*
+/compile*
+/deploy_*
+/qemu_*
+/pull*
+/push*
+/wsdef_*
+/wmi_*
+/render_*
+/zoom_*
+/irq*
+/hp_*
+/memmap*
+/inject_*
+/make_*
+/mod_src*
+/netchk*
+/login_*
+/dt_*
+/dipsw_*
+/devmem_*
+/cleanup_*
+/clkwiz_*
+/clk_hint*
+/add_v3*
+/rst_*
+/restart_*
+/repack_*
+/read_src*
+/run_infer*
+/serial_check*
+/status_check*
+/uart_*
+/who_owns*
+/verify.txt
+/vmlib.py
+/vm_alive.txt
+/vm_report.txt
+/auto*
+/qa_out.txt
+/exp_out.txt
+/sd0_out.txt
+/help_out.txt
+/probe_out.txt
+/NA/
+/*.log
+
+# -----------------------------------------------------------------------------
+# 杂项
+# -----------------------------------------------------------------------------
+__pycache__/
+*.pyc
+.agent-migration/
+.DS_Store
+Thumbs.db

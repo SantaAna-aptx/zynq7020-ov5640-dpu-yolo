@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOLOv3-tiny DPU 智能检测平台</title>
+<style>
+:root{
+  --bg:#0f1420; --panel:#181f2f; --panel2:#1e2740; --line:#2a3450;
+  --tx:#e8edf7; --tx2:#93a0bd; --acc:#4f8cff; --ok:#3ecf8e; --warn:#ffb454; --bad:#ff5d5d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:"Microsoft YaHei",system-ui,sans-serif;min-height:100vh}
+header{display:flex;align-items:center;gap:14px;padding:14px 26px;background:var(--panel);border-bottom:1px solid var(--line)}
+header .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#4f8cff,#9b5cff);display:flex;align-items:center;justify-content:center;font-weight:700}
+header h1{font-size:18px;font-weight:600}
+header .sub{color:var(--tx2);font-size:12px}
+.pill{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 12px;border-radius:20px;background:var(--panel2);border:1px solid var(--line)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--bad)}
+.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)}
+main{max-width:1280px;margin:0 auto;padding:20px 26px 60px}
+.cards{display:grid;grid-template-columns:340px 1fr;gap:18px}
+@media(max-width:900px){.cards{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{font-size:14px;color:var(--tx2);font-weight:600;margin-bottom:12px;letter-spacing:.05em}
+.grid-img{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:420px;overflow:auto}
+.gitem{position:relative;border:2px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;transition:.15s}
+.gitem:hover{border-color:var(--acc)} .gitem.sel{border-color:var(--acc);box-shadow:0 0 0 2px rgba(79,140,255,.35)}
+.gitem img{width:100%;height:88px;object-fit:cover;display:block}
+.gitem .nm{font-size:10px;padding:4px 6px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.btn.primary{background:var(--acc);color:#fff;width:100%}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.upload{margin-top:12px;border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--tx2);font-size:13px;cursor:pointer}
+.upload:hover{border-color:var(--acc);color:var(--acc)}
+.statusrows{font-size:13px;line-height:2;color:var(--tx2)}
+.statusrows b{color:var(--tx);font-weight:600}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.tag.ok{background:rgba(62,207,142,.15);color:var(--ok)} .tag.bad{background:rgba(255,93,93,.15);color:var(--bad)} .tag.warn{background:rgba(255,180,84,.15);color:var(--warn)}
+.viewer{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:800px){.viewer{grid-template-columns:1fr}}
+.frame{background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative}
+.frame img{max-width:100%;max-height:420px;display:block}
+.frame .cap{position:absolute;left:10px;top:8px;font-size:12px;color:var(--tx2);background:rgba(15,20,32,.7);padding:3px 10px;border-radius:8px}
+.empty{color:var(--tx2);font-size:14px;text-align:center;padding:40px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{color:var(--tx2);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid rgba(42,52,80,.5)}
+.bar{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#4f8cff,#3ecf8e)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--tx2)}
+.meta .kv{background:var(--panel2);border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+.meta .kv b{color:var(--tx)}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">AI</div>
+  <div><h1>YOLOv3-tiny DPU 智能检测平台</h1><div class="sub">MZ7X Zynq-7020 · B1152 DPU · 硬件加速推理</div></div>
+  <div class="pill"><span id="sdot" class="dot"></span><span id="stxt">连接中…</span></div>
+</header>
+<main>
+  <div class="cards">
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <h2>硬件状态</h2>
+        <div class="statusrows" id="hw">正在连接板卡…</div>
+      </div>
+      <div class="card">
+        <h2>图片库</h2>
+        <div class="grid-img" id="gallery"></div>
+        <label class="upload" for="upl">＋ 上传自定义图片<input id="upl" type="file" accept="image/*" hidden></label>
+        <div style="margin-top:12px"><button class="btn primary" id="runbtn" disabled>▶ 开始 DPU 推理</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>检测结果</h2>
+      <div id="placeholder" class="empty">选择左侧图片并点击「开始 DPU 推理」</div>
+      <div id="resultwrap" style="display:none">
+        <div class="viewer">
+          <div class="frame"><span class="cap">原始图片</span><img id="orig"></div>
+          <div class="frame"><span class="cap">DPU 检测结果</span><img id="annot"><div id="noload" class="empty" style="display:none">无结果图</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <h2 style="margin:0">检测目标</h2><span id="cnt" class="tag ok"></span><span id="determ" class="tag"></span>
+        </div>
+        <table><thead><tr><th>#</th><th>类别</th><th>置信度</th><th>边界框 (x1,y1)-(x2,y2)</th></tr></thead><tbody id="dets"></tbody></table>
+        <div class="meta" id="meta"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+let SEL=null, BUSY=false;
+const $=id=>document.getElementById(id);
+
+async function refreshStatus(){
+  try{
+    const s=await (await fetch('/api/status')).json();
+    const dot=$('sdot'),tx=$('stxt');
+    if(s.shell){
+      dot.className='dot ok';tx.textContent='板卡已连接 · DPU '+(s.dpu?'就绪':'未加载');
+      $('hw').innerHTML=
+        'Shell 连接 <span class="tag ok">OK</span><br>'+
+        'DPU 设备 '+(s.dpu?'<span class="tag ok">/dev/dpu</span>':'<span class="tag bad">未加载</span>')+'<br>'+
+        '网络 '+(s.net?'<span class="tag ok">'+(s.net_info.match(/inet addr:([\d.]+)/)||['',''])[1]+'</span>':'<span class="tag bad">未配置</span>')+'<br>'+
+        'FCLK0 <b>'+(s.fclk0||'-')+'</b> · FCLK1 <b>'+(s.fclk1||'-')+'</b>';
+    }else{
+      dot.className='dot warn';tx.textContent='等待板卡 shell（watcher: '+(s.watcher_state||'?')+'）';
+      $('hw').innerHTML='<span class="tag warn">watcher = '+(s.watcher_state||'?')+'</span><br>串口监听器正在尝试恢复 PetaLinux shell…';
+    }
+  }catch(e){$('sdot').className='dot';$('stxt').textContent='状态获取失败';}
+}
+
+async function loadGallery(){
+  const list=await (await fetch('/api/images')).json();
+  const g=$('gallery');g.innerHTML='';
+  list.forEach(it=>{
+    const d=document.createElement('div');d.className='gitem';
+    d.innerHTML='<img src="'+(it.thumb||('/images/'+it.name))+'" alt="'+it.name+'"><div class="nm">'+it.name+'</div>';
+    d.onclick=()=>{document.querySelectorAll('.gitem').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');SEL=it.name;$('runbtn').disabled=false;};
+    g.appendChild(d);
+  });
+}
+
+$('runbtn').onclick=async()=>{
+  if(!SEL||BUSY)return;
+  BUSY=true;const btn=$('runbtn');const old=btn.innerHTML;
+  btn.innerHTML='<span class="spin"></span> DPU 推理中…';btn.disabled=true;
+  try{
+    const r=await (await fetch('/api/infer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:SEL})})).json();
+    if(r.error){alert('推理失败：'+r.error);}
+    else show(r);
+  }catch(e){alert('请求异常：'+e);}
+  btn.innerHTML=old;btn.disabled=!SEL;BUSY=false;
+};
+
+$('upl').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  const fd=new FormData();fd.append('file',f);
+  await fetch('/api/upload',{method:'POST',body:fd});
+  await loadGallery();
+};
+
+function show(r){
+  $('placeholder').style.display='none';$('resultwrap').style.display='block';
+  $('orig').src=r.orig_url;
+  const det=$('annot');
+  if(r.result_url){det.src=r.result_url+'?t='+Date.now();det.style.display='block';$('noload').style.display='none';}
+  else{det.style.display='none';$('noload').style.display='block';}
+  const dets=r.result.dets||[];
+  $('cnt').textContent=dets.length+' 个目标';
+  const dc=(r.result.summary&&r.result.summary.DETERM_CHECK)||'';
+  const okD=/identical=1/.test(dc);
+  const el=$('determ');el.textContent=okD?'DPU 确定性校验通过':'DPU 确定性校验异常';el.className='tag '+(okD?'ok':'bad');
+  const tb=$('dets');tb.innerHTML='';
+  dets.forEach((d,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+(i+1)+'</td><td>'+d.cls+'</td><td style="min-width:130px">'+(d.conf*100).toFixed(1)+
+      '%<div class="bar"><i style="width:'+(d.conf*100)+'%"></i></div></td><td>('+d.box.join(', ')+')</td>';
+    tb.appendChild(tr);
+  });
+  if(!dets.length)tb.innerHTML='<tr><td colspan="4" style="color:var(--tx2)">未检测到目标（置信度阈值 0.5）</td></tr>';
+  const m=$('meta');m.innerHTML='';
+  const S=r.result.summary||{};
+  const add=(k,v)=>{const d=document.createElement('div');d.className='kv';d.innerHTML=k+' <b>'+v+'</b>';m.appendChild(d);};
+  if(r.result.total){const t=r.result.total.match(/([\d.]+)/);add('总耗时',t?t[1]+' s':'');}
+  add('DPU 任务耗时',r.result.timing['DPU task time']||'-');
+  for(const k of ['BOXES','OUT0','OUT1','IN_SCALE']) if(S[k]) add(k,S[k]);
+}
+
+refreshStatus();loadGallery();
+setInterval(refreshStatus,5000);
+</script>
+</body>
+</html>

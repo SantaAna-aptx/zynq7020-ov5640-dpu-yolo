@@ -1,0 +1,966 @@
+===== PAGE 1 =====
+博宸精芯开发板 FPGA开发板教学文档 
+1
+摄像头 OV5640图像采集到RAM显示到HDMI学习
+------ 基于 Kintex ultrascale+ ku5p开发板 
+编写人：杨老师、吴老师 
+编写定稿日期：2023.11.28
+===== PAGE 2 =====
+博宸精芯开发板 FPGA开发板教学文档 
+2
+目录 目录 目录 目录 
+一、 文档实现功能介绍 ................................................... ........ 3
+二、 工程新建和例程简介 ................................................... ...... 3
+三、 OV5640摄像头基本介绍 ................................................... .... 4
+四、 摄像头本教程的基本介绍和使用的接口时序描述 ................................. 6
+五、 连接开发板 ................................................... .............. 6
+六、 代码讲解 ................................................... ................ 8
+七、 上板验证 ................................................... ............... 31 
+八、 常见问题： ................................................... ............. 33 
+===== PAGE 3 =====
+博宸精芯开发板 FPGA开发板教学文档 
+3
+一、 一、 一、 一、文档实现功能介绍 文档实现功能介绍 文档实现功能介绍 文档实现功能介绍 
+本文档学习如何使用OV5640摄像头进行图像采集，然后通过其中一个口存储到一个双端口RAM，
+通过双端口RAM另一个口 ，由VGA的驱动时序产生读数地址和读使能，读出所存储的图像数据进行显 
+示。本教程仅仅实现简单的图像采集显示，本教程没有做乒乓操作、帧缓存等高级操作，图像在捕捉动 
+态目标会发生图像撕裂等现象，对于图像缓存乒乓操作，大家可自行深入研究。 
+工程新建方法请参考 
+文档《软件安装和介绍\02VIVADO 新建工程流程和软件介绍》。 
+二、 二、 二、 二、工程新建和例程简介 工程新建和例程简介 工程新建和例程简介 工程新建和例程简介 
+本教程中所用到的例程实际对应的是16_ov56401_hdmi。这个例程完整的演示了图像采集的整个 
+代码功能过程。 
+实际上为了大家方便学习，我们将例程分了好几个，其中： 
+15_ov5640_config：工程提供了一个仅仅配置摄像头寄存器的例程，演示如何配置摄像头输出 
+图像信号； 
+16_ov56401_hdmi：实现摄像头1采集图像输出到HDMI进行显示； 
+17_ov56402_hdmi：实现摄像头2采集图像输出到HDMI进行显示； 
+起始页（或 file->P r o jec t - >Ne w ） 创建新工程(Create New Project) 
+向导起始页面 点击 Next-> 
+Project Name (工程名) 工程名： 16_ov56401_hdmi 
+工程路径：(自己选择，不要有中文路径)
+勾选 Cr eate Pr oje ct Subdir ect or y , 点击 Next -> 
+Add Source(添加设计源文件) 点击 Next-> 
+Add Exsixting IP(添 加 已 有 的 IP) 点击 Next-> 
+Add Constraints(添加已有约束文件) 点击 Next-> 
+Default Part(默认配置，芯片选型) Fami ly-> Kint ex Ultrascale+ 
+Package-> ffvb676 
+Speed-> -2 
+按具体型号选择 xcku5p-ffvb676-2-i 
+New Project Summary(新建工程概况) 确认工程信息，选型等，点击 Finish 完成 
+===== PAGE 4 =====
+博宸精芯开发板 FPGA开发板教学文档 
+4
+三、 三、 三、 三、OV5640 OV5640 OV5640 OV5640摄像头基本介绍 摄像头基本介绍 摄像头基本介绍 摄像头基本介绍 
+OV 5640是OV(0mni Vision)公司生产的一颗1/4寸的CMOS Q SXGA(2592*194 4)图像传感器，提供 
+了一个完整的500W像素摄像头解决方案，并且集成了自动对焦(AF)功能，具有非常高的性价比。该传感 
+器体积小、工作电压低，提单片Q SXGA摄像头和影像处理器的所有功能。通过SCC B总线控制，可以输 
+出整子采样、缩放和取窗口等方式的各种分辨率8/10位影像数据。该产品Q SXGA图像最达到15帧/秒
+(1080P图像可达30帧， 720P图像可达60帧， QVGA分辨率时可达120帧)。用户可以完全控制图 像质量、 
+数据格式和传输方式。所有图像处理功过程包括伽玛曲线、白平衡、对比度、色度都可以通过SCC B接
+口编程。Omm i V图像传感器应用独有的传感器技术，通过减少或消除光学或电子缺 
+陷如固定图案 拖尾 、 浮散 等，提高图像质量， 得 到 清晰稳 定的 彩 色图像。 
+采用1 . 4 p m*1 . 4 p m像素大小并且使用Omni BSI技术以达到 更 高性能(高 灵敏 度、低 串扰 和低 噪声 )；
+自动图像控制功能：自动 曝 光(A E C)、自动白平衡(AWB)、自动消除 灯 光 条纹 、自动 黑 电平 校准 (A B L C) 
+和自动 带 通 滤波 器(ABF)等。 
+支持 图像质量控制：色 饱 和度 调节 、色 调调节 、g a mm a校准 、 锐 度和 镜 头 校准 等； 
+支持 R aw RGB、RGB(RGB 565/RGB 555/RGB 444)、CCIR 656、 YU V(422/420)、 Y C b C r (422)和压缩图像 
+( J P E G)输出格式 ;
+支持 Q SXGA(500W)图像 尺 寸输出，以 及按 比例缩小到其 他任 何 尺 寸 .
+其 他更详细 的代码 请参看 数据 手册 。 
+===== PAGE 5 =====
+博宸精芯开发板 FPGA开发板教学文档 
+5
+供应 商 提供的 尺 寸图和 引脚顺 序如 下 ： 
+摄像头典型机械尺寸和参数： 
+双目中心距：4cm 
+摄像头有效角度：75度
+CCD 尺寸：1/4 英寸 
+光圈（F）：3.0 
+工作电压：3.3V 
+控制接口：SCCB（兼容I2C）
+数据接口：DVP 8 位
+信号标注，与我们开发板的扩展口信号对应，D1开头是摄像头1，D2是摄像头2：
+
+===== PAGE 6 =====
+博宸精芯开发板 FPGA开发板教学文档 
+6
+四、 四、 四、 四、摄像头本教程的基本介绍和使用的接口时序描述 摄像头本教程的基本介绍和使用的接口时序描述 摄像头本教程的基本介绍和使用的接口时序描述 摄像头本教程的基本介绍和使用的接口时序描述 
+OV5640我们使用的时 候 ，本例程使用的数据格式为RGB565数据。其中，R 表 示 红 色分量， 占 5比
+特 ；G 表 示 绿 色分量， 占 6比 特 ；B 表 示 蓝 色分量， 占 5比 特 。所以，一个像素是16比 特 。 但 是，我们的摄 
+像头的数据d ata 信号 只 有8位，如何提供16位像素数据 呢？ 这 里 摄像头输出数据，其实是将像素数据 拆 
+分成 两 个 字节 ，然后通过 两 个 p i x 像素时 钟 输出。 假设 我们图像分辨率是1024X720， 表 示一行图像1024 
+个 点 。我们将图像 拆 分成 两 个 字节 输出，实际对应2048个时 钟周期 。所以摄像头的像素数据由8 b i t 输出 
+转换 成16 b i t 像素数据，可以这样处理 （当 然，处理方 法很多） ：我们在行数据有 效 的时 候 ，用一个 计 
+数器， 从 0 计 数到 像素最大 值 。 计 数等于0的时 候 我们将数据存到一个8位寄存器， 计 数等于1的时 候 ， 
+将数据 与 上一个 周期 的数据一 起 ， 拼 接成16 b i t 的数据， 拼 接完成的这个像素 周期 ，产生一个输出像素 
+有标 志 。 表 示这个像素 值拼 接完成输出，可以存到RAM或 者 FIFO 里面 ，作为存储的使能 写 信号。后 面 的 
+像素以 此类推 ，可以理解这个过程为： 计 数为 偶 数， 表 示存储像素的高 八 位， 计 数为 奇 数， 表 示摄像头 
+输出像素低 八 位并且 拼 接高 八 位产生一个完整的像素数据。 
+配置接口SCCB时序 类似 标 准 的IIC时序， 也就 是 写启 动、应 答 、 写 地址、应 答 、 写 数据、应 答 、 
+结束 等。具体 参考 IIC时序 即 可，几 乎原 理一样。 
+我们提供了 官 方一 系列 的 原厂资料给 大家 参考 ， 里面 包 含详细 的 不同模 式寄存器配置的 软件 代 
+码。 关 于摄像头配置寄存器，大家可 根 据这 些资料更改 我们的FPGA的配置的寄存器代码 来 实现。 
+五、 五、 五、 五、连接开发板 连接开发板 连接开发板 连接开发板 
+与KU5P连接,注意朝着板子外侧接口方向一致不能插错，或者错位，很关键，很多时候 
+插错了会导致开发板或者摄像头永久损坏:
+===== PAGE 7 =====
+博宸精芯开发板 FPGA开发板教学文档 
+7
+摄像头的原理图的管脚顺序和信号： 
+
+===== PAGE 8 =====
+博宸精芯开发板 FPGA开发板教学文档 
+8
+六、 六、 六、 六、代码讲解 代码讲解 代码讲解 代码讲解 
+整个代码驱动流程,分为这么几大部分：上电复位。FPGA上电之后需要给CMOS_RESET引
+脚一个拉低信号进行复位，复位脉冲宽度可参考数据手册，我们可以灵活处理，大概100ms时
+间就可以了，时间长没关系，不能太短。复位结束之后，我们需要通过SCCB协议（可以认为是 
+IIC）时序，来给摄像头配置寄存器。大约需要配置数百个寄存器，这里不多讲，可以参考代 
+码，有一部分关键寄存器有注释。寄存器配置结束之后摄像头就有图像时序输出了，然后我们 
+将摄像头并行的8位DVI数据转换成16位的RGB565就可以做下一步处理，由于摄像头输出数据由 
+行和场同步，加上RGB565数据组成，我们只需要想办法把数据通过写数据端口写入一个双端口 
+RAM，双端口RAM另一个端口通过VGA驱动的像素坐标合成 读取地址 ， 源源 不 断 的 从 RAM里 面读取 
+对应行和 列 的像素数据，就 完 成了我们摄像头数据 采集显示 。下 面 我们进行 主 要的代码讲解。 
+首先 我们讲解 顶层 的 模块ov 5640_ hd m i _ di s play ，整个 顶层模块包含 了摄像头的上电复 
+位 模块 ，寄存器配置，图像 采集 的8 - 16 比特 转换，VGA 显示 的时 钟模块 ， H DMI 编 码 模块 ，以 及 
+图像 读 写RAM的 地址 处理，和数据有效 显示区域判断 的 逻辑 ， 及 一个一 帧 图像 缓 存的数据存 储 
+RAM。 最终所 有数据 都 存 储到 一个双端口的RAM中。RAM的写端口，通过OV5640输出的数据转换 
+为16位RGB565数据之后， 在 一 帧画面 的 起始 ，由cm o s_ v s yn c1同步信号将写RAM端口 地址清零 ， 
+随 着 每 一行有效像素数据 到 来， 地址依次递增； RAM的 读 数据端口，通过VGA驱动 vga _ driver ，
+产生读地址 ，RAM数据的 地址 通过VGA时序的 pix _ x 和 pix _ y 来合成RAM 读地址 。整个 顶层 代码 如 
+下 所示 ： 
+===== PAGE 9 =====
+博宸精芯开发板 FPGA开发板教学文档 
+9
+mod ule ov5640_hdmi_dis play 
+(
+// 系统 时 钟 和 复 位信号 
+in put w i re c lk, //d e f ault 50mh z 
+in put w i re r s t _n , // re s et n
+//摄像头接口信号 
+o utput w i re cmos_sc l 1 , //cmos i2c c l oc k 
+ino ut w i re cmos_sd a 1 , //cmos i2c d ata 
+o utput w i re cmos_ re s et 1 , //cmos re s et 
+in put w i re cmos_vs y nc1 , //cmos vs y nc 
+in put w i re cmos_h re f1 , //cmos hs y nc re f re nc e 
+in put w i re cmos_ p c lk 1 , //cmos px i el c l oc k 
+in put w i re [ 7 : 0 ] cmos_d ata 1 , //cmos d ata 
+o utput w i re cmos_conf_don e 1 , //仅仅用于 指 示摄像头配置完成 
+//HDMI接口信号 
+o utput t mds_c lk _ p, // T MDS 时 钟 通 道 
+o utput t mds_c lk _n , 
+o utput [ 2 : 0 ] t mds_d ata _ p, // T MDS 数据通 道 
+o utput [ 2 : 0 ] t mds_d ata _n , 
+o utput w i re hdmi_ e n 
+) ; 
+a ssign hdmi_ e n = 1 'b 1 ; //使能HDMI的输出电 源 
+w i re cmos_v e dio_c lk 1 ; //摄像头的16比 特 RGB565输出像素时 钟 
+w i re [ 15 : 0 ] cmos_v e dio_d ata 1 ; //摄像头 合 成的RGB565像素数据 
+w i re cmos_v e dio_ we n1 ; 
+re g [ 20 : 0 ]wr i te _ a dd r _ ra m_ re g ; //像素 往 RAM存储的地址寄存器 
+w i re [ 15 : 0 ]ra m_ rea d_ p o rt _d ata; //读取RAM进行VGA显示 从 RAM 里面 取 值 的地址 
+//上电 复 位，产生一个 拉 低摄像头的 复 位信号 
+p o wer _on_ re s et p o wer _on_ re s et _ins t 1 
+(
+. c lk (c lk ) , 
+.re s et _n( r s t _n) , 
+. c a m era _ r s t n(cmos_ re s et 1)
+===== PAGE 10 =====
+博宸精芯开发板 FPGA开发板教学文档 
+10
+) ; 
+//配置摄像头的寄存器 模块 ，包 含 配置寄存器的 状 态 机 ，和SCCB接口的驱动时序代码 
+ov5640_ re g_config ov5640_ re g_config_ins t 1( 
+. c lk (c lk ) , 
+. c a m era _ r s t n(cmos_ re s et 1) , 
+. i2c_sc lk (cmos_sc l 1) , 
+. i2c_sd at (cmos_sd a 1) , 
+.re g_conf_don e (cmos_conf_don e 1) 
+) ; 
+//摄像头接口时序 转换 ，将8位数据 转换 成16为RGB565时序 
+ov5640_c apture ov5640_c apture _ins t 1 
+(
+.r s t n(cmos_ re s et 1) , 
+. ini t _don e _f la g(cmos_conf_don e 1) , 
+. cmos_ p c lk (cmos_ p c lk 1) , 
+. cmos_d ata _in(cmos_d ata 1) , 
+. cmos_vs y nc(cmos_vs y nc1) , 
+. cmos_h re f(cmos_h re f1) , 
+. cmos_oc lk (cmos_v e dio_c lk 1) , 
+. cmos_od ata (cmos_v e dio_d ata 1) , 
+. d ata _v al id(cmos_v e dio_ we n1) 
+) ; 
+//VGA驱动的时序 相关 时 钟 
+w i re c lk _148 p 5MH z; //VGA像素 参考 时 钟 
+w i re c lk _742 p 5MH z; // 74 p 25 x 5 HDMI编码的 T MDS 串 行时 钟 
+w i re l oc ke d ; // 锁相环l oc k 信号 
+// 调 用时 钟模块 产生VGA的时 钟 信号。输入50M 
+c lk _ w i z _0 c lk _ w i z _0_ins t ( 
+. c lk _o ut 1(c lk _148 p 5MH z ) , 
+. c lk _o ut 2(c lk _742 p 5MH z ) , 
+.l oc ke d( l oc ke d) , 
+. c lk _in(c lk ) , 
+.re s et n( r s t _n) 
+) ; 
+===== PAGE 11 =====
+博宸精芯开发板 FPGA开发板教学文档 
+11
+w i re rea d y; //VGA 转 HDMI的IP 就绪 信号 
+(*m ark _d ebu g ="true" *) w i re Hs y nc ; 
+(*m ark _d ebu g ="true" *) w i re Vs y nc ; 
+(*m ark _d ebu g ="true" *) w i re [ 7 : 0 ] R e d ; 
+(*m ark _d ebu g ="true" *) w i re [ 7 : 0 ] G ree n ; 
+(*m ark _d ebu g ="true" *) w i re [ 7 : 0 ] B lue; 
+//VGA 转 HDMI的编码 开源 IP，用于将VGA的时序 转换 成HDMI的 T MDS编码信号 
+hdmi_ tra nsmi tter hdmi_ tra nsmi tter _ins t ( 
+.p c lk (c lk _148 p 5MH z ) , 
+.p c lk _ x 5 (c lk _742 p 5MH z ) , 
+.r s t _n ( r s t _n) , 
+. vid e o_din ( { B lue, G ree n , R e d } ) , 
+. vid e o_hs y nc (Hs y nc) , 
+. vid e o_vs y nc (Vs y nc) , 
+. vid e o_d e ( rea d y ) , 
+.t mds_c lk _ p ( t mds_c lk _ p ) , 
+.t mds_c lk _n ( t mds_c lk _n) , 
+.t mds_d ata _ p ( t mds_d ata _ p ) , 
+.t mds_d ata _n ( t mds_d ata _n) 
+) ; 
+//以 下 代码用于 合 成 访问 RAM读取图像数据的地址 
+w i re [ 20 : 0 ]rea d_ a dd r _ ra m ; 
+w i re [ 15 : 0 ] vg a _ p i x _d ata; 
+w i re [ 10 : 0 ]p i x _ x; 
+w i re [ 10 : 0 ]p i x _ y; 
+re g [ 10 : 0 ]x _ re g ; 
+re g [ 10 : 0 ]y _ re g ; 
+a ssign rea d_ a dd r _ ra m ={y _ re g [ 9 : 0 ],x _ re g [ 9 : 0 ]}; //地址等于行和 列合 成一个地址。一行1024个数据 
+//这 些参 数对应摄像头输出图像对应的有 效 行 列区域计 数 
+para m eter V E DIO_X_ LENT H = 1024 ; 
+para m eter V E DIO_ Y _ LENT H = 720 ;
+===== PAGE 12 =====
+博宸精芯开发板 FPGA开发板教学文档 
+12
+para m eter V E DIO_X_S T AR T= 0 ; 
+para m eter V E DIO_ Y _S T AR T= 0 ; 
+para m eter V E DIO_X_ EN D = V E DIO_X_S T AR T+ V E DIO_X_ LENT H ; 
+para m eter V E DIO_ Y _ EN D = V E DIO_ Y _S T AR T+ V E DIO_ Y _ LENT H ; 
+//图像在有 效 显示 区域 的标 志 以 及 其产生的 逻辑 代码 块 
+re g im a g e _v al id_f la g_ re g ; 
+alway s @ ( p os e dg e c lk _148 p 5MH z o r n e g e dg e r s t _n) be gin 
+if( r s t _n =='b 0) be gin 
+x _ re g <=' d0 ; 
+y _ re g <=' d0 ; 
+im a g e _v al id_f la g_ re g <='b 0 ; 
+e nd 
+el s e be gin 
+if(Vs y nc =='b 0) be gin 
+x _ re g <=' d0 ; 
+y _ re g <=' d0 ; 
+e nd 
+el s e be gin 
+if( rea d y ) be gin 
+if(( p i x _ x>= V E DIO_X_S T AR T ) && ( p i x _ x< V E DIO_X_ EN D)) x _ re g <=p i x _ x- V E DIO_X_S T AR T; 
+if(( p i x _ y>= V E DIO_ Y _S T AR T ) && ( p i x _ y< V E DIO_ Y _ EN D)) y _ re g <= V E DIO_ Y _ EN D - ( p i x _ y- 
+V E DIO_ Y _S T AR T ) ; 
+if(( p i x _ x>= V E DIO_X_S T AR T ) && ( p i x _ x< V E DIO_X_ EN D) && ( p i x _ y>= V E DIO_ Y _S T AR T ) && ( p i x _ y< V E DIO_ Y _ EN D) 
+)im a g e _v al id_f la g_ re g <='b 1 ; 
+el s e im a g e _v al id_f la g_ re g <='b 0 ; 
+e nd 
+e nd 
+e nd 
+e nd 
+//如 果 在有 效 图像 区域 ， 则 显示摄像头的图像；如 果不 在， 则 全 部 显示 黑 色。 
+a ssign vg a _ p i x _d ata= (im a g e _v al id_f la g_ re g =='b 1) ? ra m_ rea d_ p o rt _d ata:' d0 ; 
+vg a _d r iv er vg a _d r iv er _ins t ( 
+. c lk (c lk _148 p 5MH z ) , // p i xel c l oc k 
+.r s t n( r s t _n) , // re s et sign al high a c t iv e
+===== PAGE 13 =====
+博宸精芯开发板 FPGA开发板教学文档 
+13
+. hs(Hs y nc) , //ho r i z on tal s y nch r oni zat ion 
+. vs(Vs y nc) , //v ert ic al s y nch r oni zat ion 
+.rea d y ( rea d y ) , //vid e o v al id 
+.r g b _ r (R e d) , //vid e o re d d ata 
+.r g b _g(G ree n) , //vid e o g ree n d ata 
+.r g b _ b (B lue ) , //vid e o blue d ata 
+. v e dio_ r g b 565(vg a _ p i x _d ata ) , 
+.x _ a dd r ( p i x _ x ) , 
+.y _ a dd r ( p i x _ y ) 
+) ; 
+//图像采集 之 后 写 入RAM的地址产生 逻辑块 
+alway s @ ( p os e dg e cmos_ p c lk 1 o r n e g e dg e r s t _n) be gin 
+if( r s t _n =='b 0) be gin 
+wr i te _ a dd r _ ra m_ re g <='b 0 ; 
+e nd 
+el s e be gin 
+if(cmos_vs y nc1 =='b 1) be gin 
+wr i te _ a dd r _ ra m_ re g <=' d0 ; 
+e nd 
+el s e if(cmos_v e dio_c lk 1 =='b 1) be gin 
+wr i te _ a dd r _ ra m_ re g <=wr i te _ a dd r _ ra m_ re g +' d1 ; 
+e nd 
+e nd 
+e nd 
+//图像帧数据的缓存RAM。A口 写 入采集的图像，B口读出到VGA显示 
+blk _m e m_g e n_0 blk _m e m_g e n_0_ins t 1 
+(
+. c lka (cmos_ p c lk 1) , 
+.e n a ( 'b 1) , 
+.wea (cmos_v e dio_ we n1) , 
+.a dd ra ( wr i te _ a dd r _ ra m_ re g) , 
+. din a (cmos_v e dio_d ata 1) , 
+. c lkb (c lk _148 p 5MH z ) , 
+.e n b ( 'b 1) , 
+.a dd rb ( rea d_ a dd r _ ra m) ,
+===== PAGE 14 =====
+博宸精芯开发板 FPGA开发板教学文档 
+14
+. do utb ( ra m_ rea d_ p o rt _d ata ) 
+) ; 
+e ndmod ule 
+然后我们讲解一下 每 个子 模块 的代码和配置。 
+power _ on _ re s et模块 ，这个 模块 代码很简 单 ，就是简 单地计 数，然后 计 数 到 了之后拉 
+高 然后复位释 放 ： 
+mod ule p o wer _on_ re s et 
+(
+in put c lk, 
+in put re s et _n , 
+o utput c a m era _ r s t n 
+) ; 
+re g [ 18 : 0 ] cn t 1 ; 
+re g [ 15 : 0 ] cn t 2 ; 
+re g c a m era _ r s t n_ re g ; 
+re g c a m era _ pw nd_ re g ; 
+a ssign c a m era _ r s t n = c a m era _ r s t n_ re g ; 
+// 5ms d elay 
+alway s @ ( p os e dg e c lk ) 
+be gin 
+if( re s et _n == 1 'b 0) be gin 
+cn t 1 <= 0 ; 
+c a m era _ pw nd_ re g <= 1 'b 1 ; 
+e nd 
+el s e if(cn t 1 < 18 ' h40000) be gin 
+cn t 1 <= cn t 1 + 1 'b 1 ; 
+c a m era _ pw nd_ re g <= 1 'b 1 ; 
+e nd 
+el s e
+===== PAGE 15 =====
+博宸精芯开发板 FPGA开发板教学文档 
+15
+c a m era _ pw nd_ re g <= 1 'b 0 ; 
+e nd 
+//1 . 3ms d elay 
+alway s @ ( p os e dg e c lk ) 
+be gin 
+if(c a m era _ pw nd_ re g == 1) be gin 
+cn t 2 <= 0 ; 
+c a m era _ r s t n_ re g <= 1 'b 0 ; 
+e nd 
+el s e if(cn t 2 < 16 ' hffff) be gin 
+cn t 2 <= cn t 2 + 1 'b 1 ; 
+c a m era _ r s t n_ re g <= 1 'b 0 ; 
+e nd 
+el s e 
+c a m era _ r s t n_ re g <= 1 'b 1 ; 
+e nd 
+e ndmod ule 
+ov 5640_ reg _c onfig模块 ，这个 模块 就是一个 状态 机，上电复位结束，开 始启 动，寄存 
+器 地址按照递增 一个个配置， 知道 配置结束拉 高 配置 完 成信号。这个 模块 向下 调 用了一个 
+i 2c_ driver 驱动 模块 ，用于输出I2C接口的时序驱动，由 ov 5640_ reg _c onfig 通过 状态 机，上电 
+后 依次 配置了约300多个寄存器，关于寄存器，大 家 可以参考OV5640数据手册了解 每 个寄存器 
+的作用： 
+//c a m era 中寄存器的配置程序 
+mod ule ov5640_ re g_config 
+(
+in put w i re c lk, 
+in put w i re c a m era _ r s t n , 
+o utput w i re re g_conf_don e, 
+o utput w i re i2c_sc lk, 
+ino ut w i re i2c_sd at 
+) ; 
+===== PAGE 16 =====
+博宸精芯开发板 FPGA开发板教学文档 
+16
+para m eter IIC_R E F_C LK _C NT= 3000 ; 
+w i re iic_ re f_c lk; 
+re g c l oc k _iic_ re f_ re g ; 
+re g [ 8 : 0 ]re g_ind ex; 
+re g [ 15 : 0 ] c l oc k _iic_ re f_cn t; 
+re g [ 1 : 0 ] config_s tep; 
+re g [ 31 : 0 ] i2c_d ata; 
+re g [ 23 : 0 ]re g_d ata; 
+re g s tart; 
+re g re g_conf_don e _ re g ; 
+w i re don e; 
+a ssign iic_ re f_c lk= c l oc k _iic_ re f_ re g ; 
+i2c_d r iv er i2c_d r iv er _ins t 1( 
+. c l oc k _i2c(iic_ re f_c lk ) , 
+. c a m era _ r s t n(c a m era _ r s t n) , 
+. i2c_d ata (i2c_d ata ) , 
+. s tart (s tart ) , 
+. don e (don e ) , 
+. i2c_sc lk (i2c_sc lk ) , 
+. i2c_sd at (i2c_sd at ) 
+) ; 
+a ssign re g_conf_don e=re g_conf_don e _ re g ; 
+//产生ii2 参考 时 钟 C LK _R E F 
+alway s @ ( p os e dg e c lk o r n e g e dg e c a m era _ r s t n) 
+be gin 
+if( ! c a m era _ r s t n) be gin 
+c l oc k _iic_ re f_ re g <= 0 ; 
+c l oc k _iic_ re f_cn t<= 0 ; 
+e nd 
+el s e if(c l oc k _iic_ re f_cn t< IIC_R E F_C LK _C NT ) 
+c l oc k _iic_ re f_cn t<= c l oc k _iic_ re f_cn t+ 1 'b 1 ; 
+el s e be gin
+===== PAGE 17 =====
+博宸精芯开发板 FPGA开发板教学文档 
+17
+c l oc k _iic_ re f_ re g <=! c l oc k _iic_ re f_ re g ; 
+c l oc k _iic_ re f_cn t<= 0 ; 
+e nd 
+e nd 
+alway s @ ( p os e dg e iic_ re f_c lk o r n e g e dg e c a m era _ r s t n) 
+be gin 
+if( ! c a m era _ r s t n) be gin 
+config_s tep<= 0 ; 
+s tart<= 0 ; 
+re g_ind ex<= 0 ; 
+re g_conf_don e _ re g <= 0 ; 
+e nd 
+el s e be gin 
+if( re g_conf_don e _ re g == 1 'b 0) be gin // N O T DO NE 
+if( re g_ind ex< 302) be gin 
+c a s e (config_s tep ) 
+0 :be gin 
+i2c_d ata<={ 8 ' h78 ,re g_d ata}; 
+//IIC D e vic e a dd r 0 x 78 
+s tart<= 1 ; 
+config_s tep<= 1 ; 
+e nd 
+1 :be gin 
+if(don e ) be gin 
+//IIC s e nd don e 
+s tart<= 0 ; 
+config_s tep<= 2 ; 
+e nd 
+e nd 
+2 :be gin 
+re g_ind ex<=re g_ind ex+ 1 'b 1 ; 
+config_s tep<= 0 ; 
+e nd 
+e ndc a s e
+===== PAGE 18 =====
+博宸精芯开发板 FPGA开发板教学文档 
+18
+e nd 
+el s e 
+re g_conf_don e _ re g <= 1 'b 1 ; 
+e nd 
+e nd 
+e nd 
+//R E G CO N FIG 
+alway s @ ( re g_ind ex ) 
+be gin 
+c a s e ( re g_ind ex ) 
+//15f p s VGA YU V o utput // 24MH z in put c l oc k, 24MH z PC LK 
+0 :re g_d ata<= 24 ' h310311 ; // s y s te m c l oc k f r om pa d , b i t[ 1 ] 
+1 :re g_d ata<= 24 ' h300882 ; // sof tware re s et, b i t[ 7 ] // d elay 5ms 
+2 :re g_d ata<= 24 ' h300842 ; // sof tware p o wer do w n , b i t[ 6 ] 
+3 :re g_d ata<= 24 ' h310303 ; // s y s te m c l oc k f r om P LL, b i t[ 1 ] 
+4 :re g_d ata<= 24 ' h3017ff ; // FR E X , Vs y nc , HR E F , PC LK, D [ 9 : 6 ] o utput e n able 
+5 :re g_d ata<= 24 ' h3018ff ; // D [ 5 : 0 ], GPIO [ 1 : 0 ] o utput e n able 
+6 :re g_d ata<= 24 ' h30341A ; // MIPI 10 -b i t 
+7 :re g_d ata<= 24 ' h303713 ; // P LL r oo t divid er, b i t[ 4 ], P LL pre- divid er, b i t[ 3 : 0 ] 
+8 :re g_d ata<= 24 ' h310801 ; // PC LK r oo t divid er, b i t[ 5 : 4 ], SC LK 2 x r oo t divid er, 
+b i t[ 3 : 2 ] // SC LK r oo t divid er, b i t[ 1 : 0 ] 
+9 :re g_d ata<= 24 ' h363036 ; 
+10 :re g_d ata<= 24 ' h36310 e; 
+11 :re g_d ata<= 24 ' h3632 e 2 ; 
+12 :re g_d ata<= 24 ' h363312 ; 
+13 :re g_d ata<= 24 ' h3621 e 0 ; 
+14 :re g_d ata<= 24 ' h3704 a 0 ; 
+15 :re g_d ata<= 24 ' h37035 a; 
+16 :re g_d ata<= 24 ' h371578 ; 
+17 :re g_d ata<= 24 ' h371701 ; 
+18 :re g_d ata<= 24 ' h370 b 60 ; 
+19 :re g_d ata<= 24 ' h37051 a; 
+20 :re g_d ata<= 24 ' h390502 ; 
+21 :re g_d ata<= 24 ' h390610 ; 
+22 :re g_d ata<= 24 ' h39010 a;
+===== PAGE 19 =====
+博宸精芯开发板 FPGA开发板教学文档 
+19
+23 :re g_d ata<= 24 ' h373112 ; 
+24 :re g_d ata<= 24 ' h360008 ; // VCM con tr o l 
+25 :re g_d ata<= 24 ' h360133 ; // VCM con tr o l 
+26 :re g_d ata<= 24 ' h302d60 ; // s y s te m con tr o l 
+27 :re g_d ata<= 24 ' h362052 ; 
+28 :re g_d ata<= 24 ' h371 b 20 ; 
+29 :re g_d ata<= 24 ' h471c50 ; 
+30 :re g_d ata<= 24 ' h3 a 1343 ; // pre- g a in = 1 . 047 x 
+31 :re g_d ata<= 24 ' h3 a 1800 ; // g a in c e i l ing 
+32 :re g_d ata<= 24 ' h3 a 19f8 ; // g a in c e i l ing = 15 . 5 x 
+33 :re g_d ata<= 24 ' h363513 ; 
+34 :re g_d ata<= 24 ' h363603 ; 
+35 :re g_d ata<= 24 ' h363440 ; 
+36 :re g_d ata<= 24 ' h362201 ; // 50/60H z d ete c t ion 
+37 :re g_d ata<= 24 ' h3c0134 ; // B a nd aut o , b i t[ 7 ] 
+38 :re g_d ata<= 24 ' h3c0428 ; // t h re sho l d l o w s u m 
+39 :re g_d ata<= 24 ' h3c0598 ; // t h re sho l d high s u m 
+40 :re g_d ata<= 24 ' h3c0600 ; // l igh t m eter 1 t h re sho l d [ 15 : 8 ] 
+41 :re g_d ata<= 24 ' h3c0708 ; // l igh t m eter 1 t h re sho l d [ 7 : 0 ] 
+42 :re g_d ata<= 24 ' h3c0800 ; // l igh t m eter 2 t h re sho l d [ 15 : 8 ] 
+43 :re g_d ata<= 24 ' h3c091c ; // l igh t m eter 2 t h re sho l d [ 7 : 0 ] 
+44 :re g_d ata<= 24 ' h3c0 a 9c ; // s a m ple n u m ber[ 15 : 8 ] 
+45 :re g_d ata<= 24 ' h3c0 b 40 ; // s a m ple n u m ber[ 7 : 0 ] 
+46 :re g_d ata<= 24 ' h381000 ; // T iming Hoffs et[ 11 : 8 ] 
+47 :re g_d ata<= 24 ' h381110 ; // T iming Hoffs et[ 7 : 0 ] 
+48 :re g_d ata<= 24 ' h381200 ; // T iming Voffs et[ 10 : 8 ] 
+49 :re g_d ata<= 24 ' h370864 ; 
+50 :re g_d ata<= 24 ' h400102 ; // B L C s tart f r om l in e 2
+51 :re g_d ata<= 24 ' h40051 a; // B L C alway s up d ate 
+52 :re g_d ata<= 24 ' h300000 ; // e n able bl oc k s 
+53 :re g_d ata<= 24 ' h3004ff ; // e n able c l oc k s 
+54 :re g_d ata<= 24 ' h300 e 58 ; // MIPI p o wer do w n , DVP e n able 
+55 :re g_d ata<= 24 ' h302 e 00 ; 
+56 :re g_d ata<= 24 ' h430060 ; // RGB565 
+57 :re g_d ata<= 24 ' h501f01 ; // ISP RGB 
+===== PAGE 20 =====
+博宸精芯开发板 FPGA开发板教学文档 
+20
+58 :re g_d ata<= 24 ' h440 e 00 ; 
+59 :re g_d ata<= 24 ' h5000 a 7 ; // Le nc on , raw g a mm a on , BPC on , WPC on , CIP on // A E C 
+tar g et 自动 曝 光控制 
+60 :re g_d ata<= 24 ' h3 a 0f30 ; // s table ra ng e in high 
+61 :re g_d ata<= 24 ' h3 a 1028 ; // s table ra ng e in l o w 
+62 :re g_d ata<= 24 ' h3 a 1 b 30 ; // s table ra ng e o ut high 
+63 :re g_d ata<= 24 ' h3 a 1 e 26 ; // s table ra ng e o ut l o w 
+64 :re g_d ata<= 24 ' h3 a 1160 ; // f a s t z on e high 
+65 :re g_d ata<= 24 ' h3 a 1f14 ; // f a s t z on e l o w // Le ns co rre c t ion fo r ? 镜 头 补偿 
+66 :re g_d ata<= 24 ' h580023 ; 
+67 :re g_d ata<= 24 ' h580114 ; 
+68 :re g_d ata<= 24 ' h58020f ; 
+69 :re g_d ata<= 24 ' h58030f ; 
+70 :re g_d ata<= 24 ' h580412 ; 
+71 :re g_d ata<= 24 ' h580526 ; 
+72 :re g_d ata<= 24 ' h58060c ; 
+73 :re g_d ata<= 24 ' h580708 ; 
+74 :re g_d ata<= 24 ' h580805 ; 
+75 :re g_d ata<= 24 ' h580905 ; 
+76 :re g_d ata<= 24 ' h580 a 08 ; 
+77 :re g_d ata<= 24 ' h580 b 0d ; 
+78 :re g_d ata<= 24 ' h580c08 ; 
+79 :re g_d ata<= 24 ' h580d03 ; 
+80 :re g_d ata<= 24 ' h580 e 00 ; 
+81 :re g_d ata<= 24 ' h580f00 ; 
+82 :re g_d ata<= 24 ' h581003 ; 
+83 :re g_d ata<= 24 ' h581109 ; 
+84 :re g_d ata<= 24 ' h581207 ; 
+85 :re g_d ata<= 24 ' h581303 ; 
+86 :re g_d ata<= 24 ' h581400 ; 
+87 :re g_d ata<= 24 ' h581501 ; 
+88 :re g_d ata<= 24 ' h581603 ; 
+89 :re g_d ata<= 24 ' h581708 ; 
+90 :re g_d ata<= 24 ' h58180d ; 
+91 :re g_d ata<= 24 ' h581908 ; 
+===== PAGE 21 =====
+博宸精芯开发板 FPGA开发板教学文档 
+21
+92 :re g_d ata<= 24 ' h581 a 05 ; 
+93 :re g_d ata<= 24 ' h581 b 06 ; 
+94 :re g_d ata<= 24 ' h581c08 ; 
+95 :re g_d ata<= 24 ' h581d0 e; 
+96 :re g_d ata<= 24 ' h581 e 29 ; 
+97 :re g_d ata<= 24 ' h581f17 ; 
+98 :re g_d ata<= 24 ' h582011 ; 
+99 :re g_d ata<= 24 ' h582111 ; 
+100 :re g_d ata<= 24 ' h582215 ; 
+101 :re g_d ata<= 24 ' h582328 ; 
+102 :re g_d ata<= 24 ' h582446 ; 
+103 :re g_d ata<= 24 ' h582526 ; 
+104 :re g_d ata<= 24 ' h582608 ; 
+105 :re g_d ata<= 24 ' h582726 ; 
+106 :re g_d ata<= 24 ' h582864 ; 
+107 :re g_d ata<= 24 ' h582926 ; 
+108 :re g_d ata<= 24 ' h582 a 24 ; 
+109 :re g_d ata<= 24 ' h582 b 22 ; 
+110 :re g_d ata<= 24 ' h582c24 ; 
+111 :re g_d ata<= 24 ' h582d24 ; 
+112 :re g_d ata<= 24 ' h582 e 06 ; 
+113 :re g_d ata<= 24 ' h582f22 ; 
+114 :re g_d ata<= 24 ' h583040 ; 
+115 :re g_d ata<= 24 ' h583142 ; 
+116 :re g_d ata<= 24 ' h583224 ; 
+117 :re g_d ata<= 24 ' h583326 ; 
+118 :re g_d ata<= 24 ' h583424 ; 
+119 :re g_d ata<= 24 ' h583522 ; 
+120 :re g_d ata<= 24 ' h583622 ; 
+121 :re g_d ata<= 24 ' h583726 ; 
+122 :re g_d ata<= 24 ' h583844 ; 
+123 :re g_d ata<= 24 ' h583924 ; 
+124 :re g_d ata<= 24 ' h583 a 26 ; 
+125 :re g_d ata<= 24 ' h583 b 28 ; 
+126 :re g_d ata<= 24 ' h583c42 ; 
+===== PAGE 22 =====
+博宸精芯开发板 FPGA开发板教学文档 
+22
+127 :re g_d ata<= 24 ' h583dc e; // le nc BR offs et // AWB 自动白平衡 
+128 :re g_d ata<= 24 ' h5180ff ; // AWB B bl oc k 
+129 :re g_d ata<= 24 ' h5181f2 ; // AWB con tr o l 
+130 :re g_d ata<= 24 ' h518200 ; // [ 7 : 4 ] m ax l oc al co u n ter, [ 3 : 0 ] m ax f a s t co u n ter 
+131 :re g_d ata<= 24 ' h518314 ; // AWB a dv a nc e d 
+132 :re g_d ata<= 24 ' h518425 ; 
+133 :re g_d ata<= 24 ' h518524 ; 
+134 :re g_d ata<= 24 ' h518609 ; 
+135 :re g_d ata<= 24 ' h518709 ; 
+136 :re g_d ata<= 24 ' h518809 ; 
+137 :re g_d ata<= 24 ' h518975 ; 
+138 :re g_d ata<= 24 ' h518 a 54 ; 
+139 :re g_d ata<= 24 ' h518 be 0 ; 
+140 :re g_d ata<= 24 ' h518c b 2 ; 
+141 :re g_d ata<= 24 ' h518d42 ; 
+142 :re g_d ata<= 24 ' h518 e 3d ; 
+143 :re g_d ata<= 24 ' h518f56 ; 
+144 :re g_d ata<= 24 ' h519046 ; 
+145 :re g_d ata<= 24 ' h5191f8 ; // AWB t o p l imi t 
+146 :re g_d ata<= 24 ' h519204 ; // AWB b o tt om l imi t 
+147 :re g_d ata<= 24 ' h519370 ; // re d l imi t 
+148 :re g_d ata<= 24 ' h5194f0 ; // g ree n l imi t 
+149 :re g_d ata<= 24 ' h5195f0 ; // blue l imi t 
+150 :re g_d ata<= 24 ' h519603 ; // AWB con tr o l 
+151 :re g_d ata<= 24 ' h519701 ; // l oc al l imi t 
+152 :re g_d ata<= 24 ' h519804 ; 
+153 :re g_d ata<= 24 ' h519912 ; 
+154 :re g_d ata<= 24 ' h519 a 04 ; 
+155 :re g_d ata<= 24 ' h519 b 00 ; 
+156 :re g_d ata<= 24 ' h519c06 ; 
+157 :re g_d ata<= 24 ' h519d82 ; 
+158 :re g_d ata<= 24 ' h519 e 38 ; // AWB con tr o l // G a mm a 伽玛曲线 
+159 :re g_d ata<= 24 ' h548001 ; // G a mm a b i a s plu s on , b i t[ 0 ] 
+160 :re g_d ata<= 24 ' h548108 ; 
+161 :re g_d ata<= 24 ' h548214 ; 
+===== PAGE 23 =====
+博宸精芯开发板 FPGA开发板教学文档 
+23
+162 :re g_d ata<= 24 ' h548328 ; 
+163 :re g_d ata<= 24 ' h548451 ; 
+164 :re g_d ata<= 24 ' h548565 ; 
+165 :re g_d ata<= 24 ' h548671 ; 
+166 :re g_d ata<= 24 ' h54877d ; 
+167 :re g_d ata<= 24 ' h548887 ; 
+168 :re g_d ata<= 24 ' h548991 ; 
+169 :re g_d ata<= 24 ' h548 a 9 a; 
+170 :re g_d ata<= 24 ' h548 baa; 
+171 :re g_d ata<= 24 ' h548c b 8 ; 
+172 :re g_d ata<= 24 ' h548dcd ; 
+173 :re g_d ata<= 24 ' h548 e dd ; 
+174 :re g_d ata<= 24 ' h548f ea; 
+175 :re g_d ata<= 24 ' h54901d ; // co l o r m atr i x 色 彩矩阵 
+176 :re g_d ata<= 24 ' h53811 e; // CMX1 fo r Y
+177 :re g_d ata<= 24 ' h53825 b; // CMX2 fo r Y
+178 :re g_d ata<= 24 ' h538308 ; // CMX3 fo r Y
+179 :re g_d ata<= 24 ' h53840 a; // CMX4 fo r U
+180 :re g_d ata<= 24 ' h53857 e; // CMX5 fo r U
+181 :re g_d ata<= 24 ' h538688 ; // CMX6 fo r U
+182 :re g_d ata<= 24 ' h53877c ; // CMX7 fo r V
+183 :re g_d ata<= 24 ' h53886c ; // CMX8 fo r V
+184 :re g_d ata<= 24 ' h538910 ; // CMX9 fo r V
+185 :re g_d ata<= 24 ' h538 a 01 ; // sign [ 9 ] 
+186 :re g_d ata<= 24 ' h538 b 98 ; // sign [ 8 : 1 ] // U V a d ju s t U V色 彩饱 和度 调 整 
+187 :re g_d ata<= 24 ' h558006 ; // s aturat ion on , b i t[ 1 ] 
+188 :re g_d ata<= 24 ' h558340 ; 
+189 :re g_d ata<= 24 ' h558410 ; 
+190 :re g_d ata<= 24 ' h558910 ; 
+191 :re g_d ata<= 24 ' h558 a 00 ; 
+192 :re g_d ata<= 24 ' h558 b f8 ; 
+193 :re g_d ata<= 24 ' h501d40 ; // e n able m a n ual offs et of con tra s t // CIP 锐化 和 降噪 
+194 :re g_d ata<= 24 ' h530008 ; // CIP sh arpe n M T t h re sho l d 1
+195 :re g_d ata<= 24 ' h530130 ; // CIP sh arpe n M T t h re sho l d 2
+196 :re g_d ata<= 24 ' h530210 ; // CIP sh arpe n M T offs et 1
+===== PAGE 24 =====
+博宸精芯开发板 FPGA开发板教学文档 
+24
+197 :re g_d ata<= 24 ' h530300 ; // CIP sh arpe n M T offs et 2
+198 :re g_d ata<= 24 ' h530408 ; // CIP D N S t h re sho l d 1
+199 :re g_d ata<= 24 ' h530530 ; // CIP D N S t h re sho l d 2
+200 :re g_d ata<= 24 ' h530608 ; // CIP D N S offs et 1
+201 :re g_d ata<= 24 ' h530716 ; // CIP D N S offs et 2
+202 :re g_d ata<= 24 ' h530908 ; // CIP sh arpe n T H t h re sho l d 1
+203 :re g_d ata<= 24 ' h530 a 30 ; // CIP sh arpe n T H t h re sho l d 2
+204 :re g_d ata<= 24 ' h530 b 04 ; // CIP sh arpe n T H offs et 1
+205 :re g_d ata<= 24 ' h530c06 ; // CIP sh arpe n T H offs et 2
+206 :re g_d ata<= 24 ' h502500 ; 
+207 :re g_d ata<= 24 ' h300802 ; // wake up f r om s ta nd by, b i t[ 6 ] 
+//640 x 480 30帧/秒 , nigh t mod e 5f p s , in put c l oc k = 24Mh z, PC LK = 56Mh z 
+208 :re g_d ata<= 24 ' h303511 ; // P LL 
+209 :re g_d ata<= 24 ' h303646 ; // P LL 
+210 :re g_d ata<= 24 ' h3c0708 ; // l igh t m eter 1 t h re sho l d [ 7 : 0 ] 
+211 :re g_d ata<= 24 ' h382041 ; // S e nso r f l i p off , ISP f l i p on 
+212 :re g_d ata<= 24 ' h382107 ; // S e nso r mi rr o r on , ISP mi rr o r on , H b inning on 
+213 :re g_d ata<= 24 ' h381431 ; // X I N C 
+214 :re g_d ata<= 24 ' h381531 ; // Y I N C 
+215 :re g_d ata<= 24 ' h380000 ; // HS : X a dd re ss s tart high byte 
+216 :re g_d ata<= 24 ' h380100 ; // HS : X a dd re ss s tart l o w byte 
+217 :re g_d ata<= 24 ' h380200 ; // VS : Y a dd re ss s tart high byte 
+218 :re g_d ata<= 24 ' h380304 ; // VS : Y a dd re ss s tart high byte 
+219 :re g_d ata<= 24 ' h38040 a; // HW (H E ) 
+220 :re g_d ata<= 24 ' h38053f ; // HW (H E ) 
+221 :re g_d ata<= 24 ' h380607 ; // VH (V E ) 
+222 :re g_d ata<= 24 ' h38079 b; // VH (V E ) 
+223 :re g_d ata<= 24 ' h380803 ; // DVPHO 
+224 :re g_d ata<= 24 ' h380920 ; // DVPHO 
+225 :re g_d ata<= 24 ' h380 a 02 ; // DVPVO 
+226 :re g_d ata<= 24 ' h380 b 58 ; // DVPVO 
+227 :re g_d ata<= 24 ' h380c07 ; // H T S // T o tal ho r i z on tal si ze 800 
+228 :re g_d ata<= 24 ' h380d68 ; // H T S 
+229 :re g_d ata<= 24 ' h380 e 03 ; // V T S // t o tal v ert ic al si ze 500 
+230 :re g_d ata<= 24 ' h380fd8 ; // V T S 
+===== PAGE 25 =====
+博宸精芯开发板 FPGA开发板教学文档 
+25
+231 :re g_d ata<= 24 ' h381306 ; // T iming Voffs et 
+232 :re g_d ata<= 24 ' h361800 ; 
+233 :re g_d ata<= 24 ' h361229 ; 
+234 :re g_d ata<= 24 ' h370952 ; 
+235 :re g_d ata<= 24 ' h370c03 ; 
+236 :re g_d ata<= 24 ' h3 a 0217 ; // 60H z m ax exp os ure, nigh t mod e 5f p s 
+237 :re g_d ata<= 24 ' h3 a 0310 ; // 60H z m ax exp os ure // ba nding fi lter s are c al c ulate d 
+aut om at ic ally in c a m era d r iv er 
+// re g_d ata<= 24 ' h3 a 0801 ; // B50 s tep 
+// re g_d ata<= 24 ' h3 a 0927 ; // B50 s tep 
+// re g_d ata<= 24 ' h3 a 0 a 00 ; // B60 s tep 
+// re g_d ata<= 24 ' h3 a 0 b f6 ; // B60 s tep 
+// re g_d ata<= 24 ' h3 a 0 e 03 ; // 50H z m ax ba nd 
+// re g_d ata<= 24 ' h3 a 0d04 ; // 60H z m ax ba nd 
+238 :re g_d ata<= 24 ' h3 a 1417 ; // 50H z m ax exp os ure, nigh t mod e 5f p s 
+239 :re g_d ata<= 24 ' h3 a 1510 ; // 50H z m ax exp os ure 
+240 :re g_d ata<= 24 ' h400402 ; // B L C 2 l in e s 
+241 :re g_d ata<= 24 ' h30021c ; // re s et J FIFO , SFIFO , J P E G 
+242 :re g_d ata<= 24 ' h3006c3 ; // dis able c l oc k of J P E G2 x, J P E G 
+243 :re g_d ata<= 24 ' h471303 ; // J P E G mod e 3
+244 :re g_d ata<= 24 ' h440704 ; // Q ua n t i zat ion sc ale 
+245 :re g_d ata<= 24 ' h460 b 35 ; 
+246 :re g_d ata<= 24 ' h460c22 ; 
+247 :re g_d ata<= 24 ' h483722 ; // DVP C LK divid er 
+248 :re g_d ata<= 24 ' h382402 ; // DVP C LK divid er 
+249 :re g_d ata<= 24 ' h5001 a 3 ; // SD E on , sc ale on , U V a v era g e off , co l o r m atr i x on , 
+AWB on 
+250 :re g_d ata<= 24 ' h350300 ; // A E C/AGC on 
+//s et OV5640 t o vid e o mod e 720 p 
+251 :re g_d ata<= 24 ' h303541 ; // P LL in put c l oc k = 24Mh z, PC LK = 84Mh z 
+252 :re g_d ata<= 24 ' h303669 ; // P LL 
+253 :re g_d ata<= 24 ' h3c0707 ; // l igh t m eter 1 t h re sho l d [ 7 : 0 ] 
+254 :re g_d ata<= 24 ' h382041 ; // f l i p 
+255 :re g_d ata<= 24 ' h382107 ; // mi rr o r 
+256 :re g_d ata<= 24 ' h381431 ; // t iming X inc
+===== PAGE 26 =====
+博宸精芯开发板 FPGA开发板教学文档 
+26
+257 :re g_d ata<= 24 ' h381531 ; // t iming Y inc 
+258 :re g_d ata<= 24 ' h380000 ; // HS 
+259 :re g_d ata<= 24 ' h380100 ; // HS 
+260 :re g_d ata<= 24 ' h380200 ; // VS 
+261 :re g_d ata<= 24 ' h3803f a; // VS 
+262 :re g_d ata<= 24 ' h38040 a; // HW (H E ) 
+263 :re g_d ata<= 24 ' h38053f ; // HW (H E ) 
+264 :re g_d ata<= 24 ' h380606 ; // VH (V E ) 
+265 :re g_d ata<= 24 ' h3807 a 9 ; // VH (V E ) 
+266 :re g_d ata<= 24 ' h380804 ; // DVPHO (1280) -> 1024 
+267 :re g_d ata<= 24 ' h380900 ; // DVPHO (1280) -> 1024 
+268 :re g_d ata<= 24 ' h380 a 02 ; // DVPVO (720) -> 
+269 :re g_d ata<= 24 ' h380 b d0 ; // DVPVO (720) -> 
+270 :re g_d ata<= 24 ' h380c07 ; // H T S 
+271 :re g_d ata<= 24 ' h380d64 ; // H T S 
+272 :re g_d ata<= 24 ' h380 e 02 ; // V T S 
+273 :re g_d ata<= 24 ' h380f e 4 ; // V T S 
+274 :re g_d ata<= 24 ' h381304 ; // t iming V offs et 
+275 :re g_d ata<= 24 ' h361800 ; 
+276 :re g_d ata<= 24 ' h361229 ; 
+277 :re g_d ata<= 24 ' h370952 ; 
+278 :re g_d ata<= 24 ' h370c03 ; 
+279 :re g_d ata<= 24 ' h3 a 0202 ; // 60H z m ax exp os ure 
+280 :re g_d ata<= 24 ' h3 a 03 e 0 ; // 60H z m ax exp os ure 
+281 :re g_d ata<= 24 ' h3 a 0800 ; // B50 s tep 
+282 :re g_d ata<= 24 ' h3 a 096f ; // B50 s tep 
+283 :re g_d ata<= 24 ' h3 a 0 a 00 ; // B60 s tep 
+284 :re g_d ata<= 24 ' h3 a 0 b 5c ; // B60 s tep 
+285 :re g_d ata<= 24 ' h3 a 0 e 06 ; // 50H z m ax ba nd 
+286 :re g_d ata<= 24 ' h3 a 0d08 ; // 60H z m ax ba nd 
+287 :re g_d ata<= 24 ' h3 a 1402 ; // 50H z m ax exp os ure 
+288 :re g_d ata<= 24 ' h3 a 15 e 0 ; // 50H z m ax exp os ure 
+289 :re g_d ata<= 24 ' h400402 ; // B L C l in e n u m ber 
+290 :re g_d ata<= 24 ' h30021c ; // re s et J FIFO , SFIFO , J PG 
+291 :re g_d ata<= 24 ' h3006c3 ; // dis able c l oc k of J P E G2 x, J P E G 
+===== PAGE 27 =====
+博宸精芯开发板 FPGA开发板教学文档 
+27
+292 :re g_d ata<= 24 ' h471303 ; // J P E G mod e 3
+293 :re g_d ata<= 24 ' h440704 ; // Q ua n t i zat ion s a c le 
+294 :re g_d ata<= 24 ' h460 b 37 ; 
+295 :re g_d ata<= 24 ' h460c20 ; 
+296 :re g_d ata<= 24 ' h483716 ; // MIPI g l o bal t iming 
+297 :re g_d ata<= 24 ' h382404 ; // PC LK m a n ual divid er 
+298 :re g_d ata<= 24 ' h500183 ; // SD E on , CMX on , AWB on 
+299 :re g_d ata<= 24 ' h350300 ; // A E C/AGC on 
+300 :re g_d ata<= 24 ' h301602 ; //S tr o be o utput e n able 
+301 :re g_d ata<= 24 ' h3 b 070 a; //FR E X s tr o be mod e 1 
+//s tr o be f la sh a nd f ra m e exp os ure 
+302 :re g_d ata<= 24 ' h3 b 0083 ; //S T ROB E C T R L: s tr o be reque s t O N, S tr o be 
+mod e: LE D3 
+303 :re g_d ata<= 24 ' h3 b 0000 ; //S T ROB E C T R L: s tr o be reque s t OFF 
+// 302 :re g_d ata<= 24 ' h503d80 ; // re g_d ata<= 24 ' h503d80 ; te s t patter n 
+s ele c t ion con tr o l, 80 : co l o r bar, 00 : te s t dis able 
+// 303 :re g_d ata<= 24 ' h474101 ; // re g_d ata<= 24 ' h47401 ; te s t patter n 
+e n able, Te s t patter n 8 -b i t 
+d e f ault:re g_d ata<= 24 ' h000000 ; 
+e ndc a s e 
+e nd 
+e ndmod ule 
+ov 5640_c apture模块 ， 负责 将摄像头的DVI并行数据（8位）通过行，场同步信号，转 
+换为16位的RGB565数据。摄像头输出8位数据，一个像素数据分为 两 个时 钟周期 输出，代码 仅 
+仅 做了8位转16位数据 拼 接，然后同时输出数据有效标 志 。代码 如 下： 
+mod ule ov5640_c apture 
+(
+in put r s t n , 
+in put ini t _don e _f la g , //Ini t Don e 
+in put cmos_ p c lk, //25MH z 
+in put [ 7 : 0 ] cmos_d ata _in , //CMOS D ata 
+in put cmos_vs y nc , // L: V a i l d 
+in put cmos_h re f , //H : V a i l d
+===== PAGE 28 =====
+博宸精芯开发板 FPGA开发板教学文档 
+28
+o utput re g cmos_oc lk, //1/2 PC LK 
+o utput re g [ 15 : 0 ] cmos_od ata, //16Bi t s RGB 
+o utput re g d ata _v al id //D ata E n able 
+) ; 
+/**************************************************
+________ ________ 
+VS | _________________________________ | 
+HS _______ _______ 
+_____________ | | __ ... ___ | | ____________ 
+**************************************************/
+re g mcmos_vs y nc ; 
+alway s @ ( p os e dg e cmos_ p c lk o r n e g e dg e r s t n) 
+be gin 
+if( !r s t n) 
+mcmos_vs y nc <= 1 ; 
+el s e 
+mcmos_vs y nc <= cmos_vs y nc ; // 场同步 ：低电平有 效 
+e nd 
+w i re cmos_vs y nc_ov er = ( { mcmos_vs y nc , cmos_vs y nc } == 2 'b 01) ? 1 'b 1 : 1 'b 0 ; //VS YN C上 升沿结束 
+//Ch a ng e t h e s e nso r d ata f r om 8 b i t s t o 16 b i t s . 
+re g byte _s tate; // byte s tate co u n t 
+re g [ 7 : 0 ] pre _cmos_id ata; 
+alway s @ ( p os e dg e cmos_ p c lk o r n e g e dg e r s t n) 
+be gin 
+if( !r s t n) 
+be gin 
+byte _s tate <= 0 ; 
+pre _cmos_id ata <= 8 ' d0 ; 
+cmos_od ata <= 16 ' d0 ; 
+e nd 
+el s e 
+be gin
+===== PAGE 29 =====
+博宸精芯开发板 FPGA开发板教学文档 
+29
+if( ~ cmos_vs y nc & cmos_h re f) //行 场 有 效 ， { HIGH B YTE, 
+L OW B YTE} 
+be gin 
+byte _s tate <= byte _s tate + 1 'b 1 ; // （ RGB565 = { HIGH B YTE, 
+L OW B YTE} 
+c a s e ( byte _s tate ) 
+1 'b 0 : pre _cmos_id ata[ 7 : 0 ] <= cmos_d ata _in ; 
+1 'b 1 : cmos_od ata[ 15 : 0 ] <= {pre _cmos_id ata[ 7 : 0 ], 
+cmos_d ata _in [ 7 : 0 ]}; 
+e ndc a s e 
+e nd 
+el s e 
+be gin 
+byte _s tate <= 0 ; 
+pre _cmos_id ata <= 8 ' d0 ; 
+cmos_od ata <= cmos_od ata; 
+e nd 
+e nd 
+e nd 
+//W a i t fo r S e nso r o utput D ata v al id， 10 F ra nm e 
+re g [ 3 : 0 ] f ra m e _con t; 
+re g f ra m e _v al id ; 
+alway s @ ( p os e dg e cmos_ p c lk o r n e g e dg e r s t n) 
+be gin 
+if( !r s t n) 
+be gin 
+f ra m e _con t <= 0 ; 
+f ra m e _v al id <= 0 ; 
+e nd 
+el s e if(ini t _don e _f la g) //CMOS I2C 初始化 
+结束 
+be gin 
+if(cmos_vs y nc_ov er == 1 'b 1) //帧 结束 
+be gin 
+if(f ra m e _con t < 12)
+===== PAGE 30 =====
+博宸精芯开发板 FPGA开发板教学文档 
+30
+be gin 
+f ra m e _con t <= f ra m e _con t + 1 'b 1 ; 
+f ra m e _v al id <= 1 'b 0 ; 
+e nd 
+el s e 
+be gin 
+f ra m e _con t <= f ra m e _con t; 
+f ra m e _v al id <= 1 'b 1 ; //帧数据输出有 效 
+e nd 
+e nd 
+e nd 
+e nd 
+//CMOS_DA T A数据 同步 输出使能时 钟 
+alway s @ ( p os e dg e cmos_ p c lk o r n e g e dg e r s t n) 
+be gin 
+if( !r s t n) 
+cmos_oc lk <= 0 ; 
+el s e if(f ra m e _v al id == 1 'b 1 && byte _s tate )//(X_Con t >= 1 && X_Con t <= H_DISP)) 
+cmos_oc lk <= ~ cmos_oc lk; 
+el s e 
+cmos_oc lk <= 0 ; 
+e nd 
+//数据输出有 效 CMOS_VA L ID 
+alway s @ ( p os e dg e cmos_ p c lk o r n e g e dg e r s t n) 
+be gin 
+if( !r s t n) 
+d ata _v al id <= 0 ; 
+el s e if(f ra m e _v al id == 1 'b 1) 
+d ata _v al id <= ~ cmos_vs y nc ; 
+el s e 
+d ata _v al id <= 0 ; 
+e nd 
+===== PAGE 31 =====
+博宸精芯开发板 FPGA开发板教学文档 
+31
+e ndmod ule 
+VGA转 H DMI的时 钟模块 c lk _ wiz _0， 模块 的IP配置输入时 钟 50M，输出一 路 148.5M和一 路 
+742.5 频率 。 
+代码中用 到 我们VGA转 H DMI接口的 hd m i _ tran sm itter模块 。这里我们不做 重 复，大 家直 
+接参 阅《 12 H DMI接口使用VGA 显示》 教程 即 可。 
+代码的 vga _ driver ，用于 产生 我们 显示 图像的时序。这部分大 家也直 接参考 《 12 H DMI 
+接口使用VGA 显示》 教程，这里VGA时序代码用的720P @ 60 hz 标 准 ，为了兼容大部分 显示 器： 
+七、 七、 七、 七、上板验证 上板验证 上板验证 上板验证 
+我们将工程 综 合， 绑定 管脚然后 生 成BIT文 件 。管脚 绑定如 下，我们使用双摄像头的 其 
+中一个摄像头，我们用 到 KE Y 1做复位 按钮 ： 
+===== PAGE 32 =====
+博宸精芯开发板 FPGA开发板教学文档 
+32
+我们 绑定完 管脚 直 接 生 成 比特 文 件 。开发板连接 H DMI 线到 一 台 标 准 的 显示 器，开机连 
+接开发板 烧 写了BIT文 件 之后可以 看到 图像了。 最 后可以 看到 ，图像 从左 上角开 始显示 。图像 
+是 左右镜 像，大 家 可以 思 考一下，对于图像 显示起点镜 像 如何操 作。 如 需 测试 摄像头2，可以 
+使用 《 17_ ov 56402_ hd m i》 。 
+===== PAGE 33 =====
+博宸精芯开发板 FPGA开发板教学文档 
+33
+八、 八、 八、 八、常见问题： 常见问题： 常见问题： 常见问题： 
+1、 显示 器只 显示左 上角 区域 部分：对于 H DMI输出，我们是720P分 辨率 1280 x 720 而 摄像 
+头是1024 x 768分 辨率 ， 所 以我们 显示 图像 从左 上角 第 一个 点扫 描出来就是只 显示左 上角 ； 
+2、图像 无显示 ： 检查 摄像头的 排线 是 否 插 好 ，并 且H DMI接口和 线检查 是 否 连接 好 ，或 
+者 H DMI 线 有问题。 直 接使用 H DMI 显示 例程 测试 有 无 输出。 
