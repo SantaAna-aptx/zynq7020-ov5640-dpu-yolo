@@ -15,7 +15,7 @@
 ## 清晨第一条命令（一键判定）
 ```
 cd /d E:\yoloProject\board_deploy
-python -X utf8 -c "import paramiko,time; c=paramiko.SSHClient(); c.set_missing_host_key_policy(paramiko.AutoAddPolicy()); c.connect('192.168.1.50',username='root',password='root',timeout=20); _,o,_=c.exec_command('dd if=/dev/mem bs=4 skip=67108864 count=460800 2>/dev/null | tr -d \"\\000\" | wc -c'); print('non-00 bytes:', o.read().decode().strip(), '/1843200 — 若 >>1000 即在出流'); c.close()"
+python -X utf8 -c "import os,paramiko,time; c=paramiko.SSHClient(); c.set_missing_host_key_policy(paramiko.AutoAddPolicy()); c.connect('192.168.1.50',username='root',password=os.environ['BOARD_PW'],timeout=20); _,o,_=c.exec_command('dd if=/dev/mem bs=4 skip=67108864 count=460800 2>/dev/null | tr -d \"\\000\" | wc -c'); print('non-00 bytes:', o.read().decode().strip(), '/1843200 — 若 >>1000 即在出流'); c.close()"
 ```
 - **non-00 >> 1000** → 正在出流！立即：拉帧渲染 + 启动 video_loop
 - non-00 ≈ 300 静止 → 自愈仍在尝试（正常，等传感器醒）；检查 PWDN 接地是否真实到达（万用表量模组 PWDN 脚对 GND 应为 0V）

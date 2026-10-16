@@ -261,16 +261,22 @@ darknet 风格 letterbox（保持宽高比、灰边填充 0.5）+ 带 letterbox 
 
 ---
 
-## 12. 第三方代码与来源说明
+## 11. 第三方代码与来源说明
 
 本仓库中**并非全部代码都是原创**。为便于复现，以下文件保留了原作者版权头：
 
-| 文件 | 来源 | 说明 |
+| 文件 | 来源 | 本项目所做的改动 |
 |---|---|---|
-| `rtl/I2C_OV5640_1280720_Config.v` | **CrazyBingo**（www.cnblogs.com/crazybingo）<br>Copyright 2012, All Rights Reserved | OV5640 上电寄存器配置表。摄像头能出图的关键依赖，本项目的改动是在其末尾追加了 `0x3820` / `0x3821` 并修正 `0x4300=0x61`（色彩顺序） |
-| `rtl/i2c_timing_ctrl_reg16_dat8_wronly.v` | **CrazyBingo** | SCCB/I2C 时序控制器 |
-| `rtl/CMOS_Capture_RAW_Gray.v` | **CrazyBingo** | 早期参考实现，当前通路未使用 |
-| `rtl/asyn_fifo.v` | 第三方（见文件头） | 异步 FIFO |
+| `rtl/I2C_OV5640_1280720_Config.v` | **CrazyBingo**（www.cnblogs.com/crazybingo）<br>Copyright 2012, All Rights Reserved | OV5640 上电寄存器配置表，摄像头能出图的关键依赖。末尾追加 `0x3820` / `0x3821`（消除上下分屏），修正 `0x4300=0x61`（R/B 顺序） |
+| `rtl/i2c_timing_ctrl_reg16_dat8_wronly.v` | **CrazyBingo** | SCCB/I2C 时序控制器。SCL 降速至 33 kHz、SDA 改开路漏极、增加 sticky ACK 输出 |
+| `rtl/asyn_fifo.v` | 第三方（见文件头） | 未改动 |
+
+> ⚠️ **许可状态提示（如实披露）**：上表前两个文件的原始版权头声明为
+> `CONFIDENTIAL IN CONFIDENCE` / *This confidential and proprietary software may be only used
+> as authorized by a license agreement*。本项目**未从原作者处取得书面再分发授权**，保留它们
+> 是为了让摄像头通路可复现。若需商业使用或再分发，请自行联系原作者取得许可，或自行实现
+> 等价的 SCCB 主机与寄存器配置表。**这两个文件不适用本仓库的 MIT 协议**（见 `LICENSE`
+> 末尾的 Third-party notice）。
 
 **自研部分**（本项目的主要工作）：
 
@@ -286,7 +292,7 @@ darknet 风格 letterbox（保持宽高比、灰边填充 0.5）+ 带 letterbox 
 
 ---
 
-## 13. 模型来源说明
+## 12. 模型来源说明
 
 `board_deploy/deephi_rel.o` 中的 DPU 模型段
 （`.deephi.strtab/metadata/configurable/tensor/node/parameter/code.tiny_yolo`）
@@ -301,3 +307,34 @@ arm-linux-gnueabihf-elfedit --output-type=rel deephi.o     # 必须，否则链�
 ```
 
 若你有用 `dnnc` 自行编译的模型 ELF，可以直接替换它参与链接。
+
+---
+
+## 13. 目录结构对照说明
+
+本仓库保留了开发期自然形成的目录结构，未按推荐结构迁移。原因：Vivado 的 `.xpr` 以相对
+路径硬引用 `vivado_projects/` 下的 2500+ 个文件，整体迁移的破坏风险高于收益。按赛题
+"采用其他组织方式的队伍须在 README.md 中给出目录对照说明"的要求，对照表如下：
+
+| 推荐目录 | 本仓库对应位置 | 内容 |
+|---|---|---|
+| `README.md` | `README.md` | 项目简介与复现步骤 |
+| `src/` | `rtl/`、`board_deploy/cam_stream.cpp`、`system-user.dtsi` | PL 采集 RTL 与 PS 侧软件 |
+| `sim/` | `rtl/cam_tb.v`、`rtl/cam_tb2.v`、`rtl/fw_tb.v`、`rtl/run_sim.bat` | 仿真测试台与运行脚本 |
+| `build/` | `vivado_projects/unified/`、`board_deploy/build_cam_stream.ps1` | Vivado 工程、Block Design 与可复现构建脚本 |
+| `board/` | `board_deploy/bringup_and_stream.ps1`、`deploy_stream.ps1`、`unified_clkfix_sw.bin` | 上板工程与运行脚本 |
+| `data/` | `docs/`、`board_deploy/backup/` | 实测输出、基线版本与参考结果 |
+| `skill/` | **待补** | 技能包（从开发过程中沉淀的可复用经验） |
+| `report/` | `board_deploy/*.md`（见 §9 文档索引）；正式设计报告**待补** | 设计文档、踩坑记录与设计报告 |
+
+> 所有目录名与文件名均为纯英文（小写字母、数字、下划线或连字符），符合跨平台复现要求。
+
+---
+
+## 14. 许可
+
+本仓库**原创部分**采用 **MIT License**，见 [`LICENSE`](LICENSE)。
+
+- 第三方 RTL 文件的权利仍属原作者，**不适用** MIT 协议，来源与改动情况详见 §11；
+- Xilinx/AMD 专有材料（DNNDK、DPU TRD、Vivado 生成的 IP wrapper）**未包含**在本仓库中，
+  请从 AMD 官方渠道获取。
