@@ -134,7 +134,12 @@ initial begin
             e1 = 16'h1000 + base + 1;
             e2 = 16'h1000 + base + 2;
             e3 = 16'h1000 + base + 3;
-            exp_addr = 32'h0800_0000 + 8 * i;   // rolling write: strictly sequential addresses
+            // The writer restarts the rolling window at every tuser (frame start), so the
+            // k-th beat WITHIN a frame lands at FRAME_BASE + 8*k, and consecutive frames
+            // deliberately reuse the same addresses. An earlier revision of this check
+            // assumed addresses never repeat, which is wrong for a per-frame rolling window
+            // and produced a spurious [ERR] on the first beat of every frame after the first.
+            exp_addr = 32'h0800_0000 + 8 * (i % (LINES * PX_PER_LINE / 4));
             if (mem[i % 4096] !== {e3, e2, e1, e0}) begin
                 errors = errors + 1;
                 if (errors < 8)

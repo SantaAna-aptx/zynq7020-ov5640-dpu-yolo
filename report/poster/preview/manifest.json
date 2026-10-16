@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "libreoffice",
+  "source": "saved",
+  "inputPath": "E:\\yoloProject\\report\\poster\\one_page_poster.pptx",
+  "sourceSha256": "740342badf495dfebdabf1791437ff38661fa8e8b2635a3d020dcba6dfad0728",
+  "dpi": 150,
+  "pageCount": 1,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "E:\\yoloProject\\report\\poster\\preview\\page-0001.png",
+      "width": 1501,
+      "height": 1126,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 960.0666666666667,
+        "height": 720.0666666666667
+      },
+      "byteLength": 127268
+    }
+  ],
+  "missingFonts": []
+}

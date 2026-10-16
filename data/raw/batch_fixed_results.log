@@ -1,0 +1,306 @@
+
+#### IMAGE: dog.jpg
+IMAGE_INFO: dog.jpg 768x576 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-82 max=24 sum=-1219229 first8=3,1,0,-1,-55,-16,-25,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-127 max=32 sum=-6672273 first8=-1,-3,-1,-2,-59,-1,-24,-7
+-----------------------------
+Class name: car     [ID]:2  conf=0.880797  box=(434,74)-(709,174)
+-----------------------------
+Class name: truck     [ID]:7  conf=0.989013  box=(509,60)-(649,194)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.679179  box=(108,167)-(396,533)
+RUN1_DECODE: raw=6 nms=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-82 max=24 sum=-1219229 first8=3,1,0,-1,-55,-16,-25,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-127 max=32 sum=-6672273 first8=-1,-3,-1,-2,-59,-1,-24,-7
+-----------------------------
+Class name: car     [ID]:2  conf=0.880797  box=(434,74)-(709,174)
+-----------------------------
+Class name: truck     [ID]:7  conf=0.989013  box=(509,60)-(649,194)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.679179  box=(108,167)-(396,533)
+RUN2_DECODE: raw=6 nms=3
+DETERM_EXTRA: run3=-7891502 run4=-7891502 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-82 max=24 sum=-1219229 first8=3,1,0,-1,-55,-16,-25,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-127 max=32 sum=-6672273 first8=-1,-3,-1,-2,-59,-1,-24,-7
+-----------------------------
+Class name: car     [ID]:2  conf=0.880797  box=(434,74)-(709,174)
+-----------------------------
+Class name: truck     [ID]:7  conf=0.989013  box=(509,60)-(649,194)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.679179  box=(108,167)-(396,533)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m2.15897[0m seconds
+___set_input_image time: 0.320247 seconds
+___DPU task time:        0.125501 seconds
+___deal time:            0.0464286 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 33129232
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-82 max=24 sum=-1219229
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-127 max=32 sum=-6672273
+DETERM_CHECK: run1=-7891502 run2=-7891502 identical=1
+BOXES: raw=6 after_nms=3
+==== DIAG END ====
+
+
+#### IMAGE: person.jpg
+IMAGE_INFO: person.jpg 640x424 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=29 sum=-1130197 first8=2,5,-2,-1,-48,-28,-36,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=37 sum=-6514948 first8=1,-1,-1,-2,-53,-13,-27,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.880797  box=(173,91)-(287,396)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.982014  box=(81,253)-(198,364)
+-----------------------------
+Class name: horse     [ID]:17  conf=0.939913  box=(379,114)-(619,351)
+RUN1_DECODE: raw=7 nms=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=29 sum=-1130197 first8=2,5,-2,-1,-48,-28,-36,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=37 sum=-6514948 first8=1,-1,-1,-2,-53,-13,-27,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.880797  box=(173,91)-(287,396)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.982014  box=(81,253)-(198,364)
+-----------------------------
+Class name: horse     [ID]:17  conf=0.939913  box=(379,114)-(619,351)
+RUN2_DECODE: raw=7 nms=3
+DETERM_EXTRA: run3=-7645145 run4=-7645145 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=29 sum=-1130197 first8=2,5,-2,-1,-48,-28,-36,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=37 sum=-6514948 first8=1,-1,-1,-2,-53,-13,-27,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.880797  box=(173,91)-(287,396)
+-----------------------------
+Class name: dog     [ID]:16  conf=0.982014  box=(81,253)-(198,364)
+-----------------------------
+Class name: horse     [ID]:17  conf=0.939913  box=(379,114)-(619,351)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m1.88581[0m seconds
+___set_input_image time: 0.263031 seconds
+___DPU task time:        0.125499 seconds
+___deal time:            0.0468557 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 38730196
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-90 max=29 sum=-1130197
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-128 max=37 sum=-6514948
+DETERM_CHECK: run1=-7645145 run2=-7645145 identical=1
+BOXES: raw=7 after_nms=3
+==== DIAG END ====
+
+
+#### IMAGE: eagle.jpg
+IMAGE_INFO: eagle.jpg 773x512 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-98 max=44 sum=-1248467 first8=3,4,-1,-2,-49,-26,-35,-27
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=46 sum=-7294786 first8=0,-2,-1,-3,-54,-12,-25,-16
+-----------------------------
+Class name: bird     [ID]:14  conf=0.817575  box=(143,30)-(621,503)
+RUN1_DECODE: raw=3 nms=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-98 max=44 sum=-1248467 first8=3,4,-1,-2,-49,-26,-35,-27
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=46 sum=-7294786 first8=0,-2,-1,-3,-54,-12,-25,-16
+-----------------------------
+Class name: bird     [ID]:14  conf=0.817575  box=(143,30)-(621,503)
+RUN2_DECODE: raw=3 nms=1
+DETERM_EXTRA: run3=-8543253 run4=-8543253 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-98 max=44 sum=-1248467 first8=3,4,-1,-2,-49,-26,-35,-27
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-128 max=46 sum=-7294786 first8=0,-2,-1,-3,-54,-12,-25,-16
+-----------------------------
+Class name: bird     [ID]:14  conf=0.817575  box=(143,30)-(621,503)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m2.06405[0m seconds
+___set_input_image time: 0.300404 seconds
+___DPU task time:        0.125494 seconds
+___deal time:            0.0453125 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 24743103
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-98 max=44 sum=-1248467
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-128 max=46 sum=-7294786
+DETERM_CHECK: run1=-8543253 run2=-8543253 identical=1
+BOXES: raw=3 after_nms=1
+==== DIAG END ====
+
+
+#### IMAGE: giraffe.jpg
+IMAGE_INFO: giraffe.jpg 500x500 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-84 max=32 sum=-1215321 first8=4,1,0,-2,-53,-13,-26,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-114 max=37 sum=-7025140 first8=0,0,-1,-1,-52,-10,-28,-12
+-----------------------------
+Class name: zebra     [ID]:22  conf=0.562177  box=(285,174)-(431,479)
+-----------------------------
+Class name: giraffe     [ID]:23  conf=0.562177  box=(120,-42)-(469,460)
+RUN1_DECODE: raw=2 nms=2
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-84 max=32 sum=-1215321 first8=4,1,0,-2,-53,-13,-26,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-114 max=37 sum=-7025140 first8=0,0,-1,-1,-52,-10,-28,-12
+-----------------------------
+Class name: zebra     [ID]:22  conf=0.562177  box=(285,174)-(431,479)
+-----------------------------
+Class name: giraffe     [ID]:23  conf=0.562177  box=(120,-42)-(469,460)
+RUN2_DECODE: raw=2 nms=2
+DETERM_EXTRA: run3=-8240461 run4=-8240461 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-84 max=32 sum=-1215321 first8=4,1,0,-2,-53,-13,-26,-15
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-114 max=37 sum=-7025140 first8=0,0,-1,-1,-52,-10,-28,-12
+-----------------------------
+Class name: zebra     [ID]:22  conf=0.562177  box=(285,174)-(431,479)
+-----------------------------
+Class name: giraffe     [ID]:23  conf=0.562177  box=(120,-42)-(469,460)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m1.94444[0m seconds
+___set_input_image time: 0.275573 seconds
+___DPU task time:        0.125493 seconds
+___deal time:            0.0454787 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 20757113
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-84 max=32 sum=-1215321
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-114 max=37 sum=-7025140
+DETERM_CHECK: run1=-8240461 run2=-8240461 identical=1
+BOXES: raw=2 after_nms=2
+==== DIAG END ====
+
+
+#### IMAGE: horses.jpg
+IMAGE_INFO: horses.jpg 773x512 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=14 sum=-1124244 first8=2,4,-1,-1,-48,-26,-37,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-117 max=29 sum=-6479565 first8=1,-1,-1,-2,-55,-14,-29,-15
+-----------------------------
+Class name: horse     [ID]:17  conf=0.562177  box=(-52,161)-(223,329)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(249,90)-(430,455)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(377,194)-(654,362)
+RUN1_DECODE: raw=6 nms=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=14 sum=-1124244 first8=2,4,-1,-1,-48,-26,-37,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-117 max=29 sum=-6479565 first8=1,-1,-1,-2,-55,-14,-29,-15
+-----------------------------
+Class name: horse     [ID]:17  conf=0.562177  box=(-52,161)-(223,329)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(249,90)-(430,455)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(377,194)-(654,362)
+RUN2_DECODE: raw=6 nms=3
+DETERM_EXTRA: run3=-7603809 run4=-7603809 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-90 max=14 sum=-1124244 first8=2,4,-1,-1,-48,-26,-37,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-117 max=29 sum=-6479565 first8=1,-1,-1,-2,-55,-14,-29,-15
+-----------------------------
+Class name: horse     [ID]:17  conf=0.562177  box=(-52,161)-(223,329)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(249,90)-(430,455)
+-----------------------------
+Class name: cow     [ID]:19  conf=0.904651  box=(377,194)-(654,362)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m2.06816[0m seconds
+___set_input_image time: 0.300593 seconds
+___DPU task time:        0.125499 seconds
+___deal time:            0.0463614 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 117  IN_SUM: 33288214
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-90 max=14 sum=-1124244
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-117 max=29 sum=-6479565
+DETERM_CHECK: run1=-7603809 run2=-7603809 identical=1
+BOXES: raw=6 after_nms=3
+==== DIAG END ====
+
+
+#### IMAGE: kite.jpg
+IMAGE_INFO: kite.jpg 1352x900 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-100 max=20 sum=-1223613 first8=2,4,-2,-1,-48,-27,-36,-29
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-126 max=34 sum=-6959828 first8=1,-1,-2,-2,-55,-12,-26,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.851953  box=(98,520)-(174,848)
+-----------------------------
+Class name: kite     [ID]:33  conf=0.952574  box=(592,42)-(668,197)
+RUN1_DECODE: raw=4 nms=2
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-100 max=20 sum=-1223613 first8=2,4,-2,-1,-48,-27,-36,-29
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-126 max=34 sum=-6959828 first8=1,-1,-2,-2,-55,-12,-26,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.851953  box=(98,520)-(174,848)
+-----------------------------
+Class name: kite     [ID]:33  conf=0.952574  box=(592,42)-(668,197)
+RUN2_DECODE: raw=4 nms=2
+DETERM_EXTRA: run3=-8183441 run4=-8183441 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-100 max=20 sum=-1223613 first8=2,4,-2,-1,-48,-27,-36,-29
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-126 max=34 sum=-6959828 first8=1,-1,-2,-2,-55,-12,-26,-14
+-----------------------------
+Class name: person     [ID]:0  conf=0.851953  box=(98,520)-(174,848)
+-----------------------------
+Class name: kite     [ID]:33  conf=0.952574  box=(592,42)-(668,197)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m3.21278[0m seconds
+___set_input_image time: 0.52229 seconds
+___DPU task time:        0.1255 seconds
+___deal time:            0.0459531 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 45225912
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-100 max=20 sum=-1223613
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-126 max=34 sum=-6959828
+DETERM_CHECK: run1=-8183441 run2=-8183441 identical=1
+BOXES: raw=4 after_nms=2
+==== DIAG END ====
+
+
+#### IMAGE: bike.jpg
+IMAGE_INFO: bike.jpg 860x573 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-94 max=28 sum=-1197786 first8=2,4,-2,-1,-50,-26,-34,-26
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-125 max=31 sum=-6563385 first8=1,-1,-2,-2,-53,-11,-26,-14
+-----------------------------
+Class name: bicycle     [ID]:1  conf=0.924142  box=(-65,35)-(925,560)
+RUN1_DECODE: raw=3 nms=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-94 max=28 sum=-1197786 first8=2,4,-2,-1,-50,-26,-34,-26
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-125 max=31 sum=-6563385 first8=1,-1,-2,-2,-53,-11,-26,-14
+-----------------------------
+Class name: bicycle     [ID]:1  conf=0.924142  box=(-65,35)-(925,560)
+RUN2_DECODE: raw=3 nms=1
+DETERM_EXTRA: run3=-7761171 run4=-7761171 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-94 max=28 sum=-1197786 first8=2,4,-2,-1,-50,-26,-34,-26
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-125 max=31 sum=-6563385 first8=1,-1,-2,-2,-53,-11,-26,-14
+-----------------------------
+Class name: bicycle     [ID]:1  conf=0.924142  box=(-65,35)-(925,560)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m2.19486[0m seconds
+___set_input_image time: 0.329266 seconds
+___DPU task time:        0.125502 seconds
+___deal time:            0.0449396 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 49524358
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-94 max=28 sum=-1197786
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-125 max=31 sum=-6563385
+DETERM_CHECK: run1=-7761171 run2=-7761171 identical=1
+BOXES: raw=3 after_nms=1
+==== DIAG END ====
+
+
+#### IMAGE: blackdog.jpg
+IMAGE_INFO: blackdog.jpg 803x620 ch=3
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-79 max=12 sum=-1052021 first8=2,3,-2,-1,-52,-18,-31,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-122 max=27 sum=-6166208 first8=0,-2,-2,-2,-59,-17,-25,-20
+-----------------------------
+Class name: dog     [ID]:16  conf=0.924142  box=(65,115)-(561,606)
+RUN1_DECODE: raw=1 nms=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-79 max=12 sum=-1052021 first8=2,3,-2,-1,-52,-18,-31,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-122 max=27 sum=-6166208 first8=0,-2,-2,-2,-59,-17,-25,-20
+-----------------------------
+Class name: dog     [ID]:16  conf=0.924142  box=(65,115)-(561,606)
+RUN2_DECODE: raw=1 nms=1
+DETERM_EXTRA: run3=-7218229 run4=-7218229 conv32=1 conv43=1
+RAWOUT[0] conv2d_10_convolution ch=255 h=13 w=13 scale=0.25 min=-79 max=12 sum=-1052021 first8=2,3,-2,-1,-52,-18,-31,-28
+RAWOUT[1] conv2d_13_convolution ch=255 h=26 w=26 scale=0.25 min=-122 max=27 sum=-6166208 first8=0,-2,-2,-2,-59,-17,-25,-20
+-----------------------------
+Class name: dog     [ID]:16  conf=0.924142  box=(65,115)-(561,606)
+RESULT_SAVED jpg=1 bmp=1 /home/root/result.jpg /home/root/result.bmp
+
+Total time:              [33m2.22798[0m seconds
+___set_input_image time: 0.335313 seconds
+___DPU task time:        0.125496 seconds
+___deal time:            0.0449667 seconds
+==== DIAG SUMMARY ====
+IN_SCALE: 128  IN_MIN: 0  IN_MAX: 127  IN_SUM: 34760222
+OUT0: scale=0.25 ch=255 13x13 size=43095 min=-79 max=12 sum=-1052021
+OUT1: scale=0.25 ch=255 26x26 size=172380 min=-122 max=27 sum=-6166208
+DETERM_CHECK: run1=-7218229 run2=-7218229 identical=1
+BOXES: raw=1 after_nms=1
+==== DIAG END ====
+
+
+BATCH_FIXED_DONE

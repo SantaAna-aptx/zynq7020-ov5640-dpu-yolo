@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/frame_writer.v" into library work
+INFO: [VRFC 10-311] analyzing module frame_writer
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/fw_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module fw_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado2019.1/VIVADO20191/Vivado/2019.1/data/verilog/src/glbl.v" into library work
+INFO: [VRFC 10-311] analyzing module glbl

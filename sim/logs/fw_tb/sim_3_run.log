@@ -1,0 +1,17 @@
+
+****** xsim v2019.1 (64-bit)
+  **** SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
+  **** IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/fw_tb_sim/xsim_script.tcl
+# xsim {fw_tb_sim} -autoloadwcfg -runall
+Vivado Simulator 2019.1
+Time resolution is 1 ps
+run -all
+[TB] frame_writer test start
+[TB] beats=1280 expected=1280 errors=0
+SIM_RESULT=PASS
+$finish called at time : 235370 ns : File "E:/yoloProject/rtl/fw_tb.v" Line 158
+exit
+INFO: [Common 17-206] Exiting xsim at Fri Oct 16 19:55:04 2026...

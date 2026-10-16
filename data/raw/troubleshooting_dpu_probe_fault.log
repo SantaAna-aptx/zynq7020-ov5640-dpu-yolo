@@ -1,0 +1,271 @@
+=== connect, sync check ===
+'\r\nsh-4.4# '
+
+[OK] $ echo SHELL_ALIVE
+SHELL_ALIVE
+
+[OK] $ devmem 0x40000000
+Unhandled fault: external abort on non-linefetch (0x018) at 0xb6fab000
+pgd = (ptrval)
+[b6fab000] *pgd=3ec84831
+>>> DPU SIGNATURE: CHECK: Unhandled fault: external abort on non-linefetch (0x018) at 0xb6fab000
+pgd = (ptrval)
+[b6fab000] *pgd=3ec84831
+
+[OK] $ ls -la /dev/dpu 2>&1
+ls: cannot access '/dev/dpu': No such file or directory
+>>> /dev/dpu: OK ✓
+
+[OK] $ dmesg 2>/dev/null | grep -i dpu | tail -4
+[   41.617167] [DPU][712]Checking DPU signature at addr = 0x40f00000, 
+[   41.638841] Modules linked in: dpu(O+)
+[   41.651741] PC is at dpu_probe+0x134/0xfdc [dpu]
+[   41.899065] [<bf002f44>] (dpu_probe [dpu]) from [<c03e2224>] (platform_drv_probe+0x48/0x94)
+
+[OK] $ ifconfig eth0 192.168.1.50 netmask 255.255.255.0 up 2>&1
+
+
+[OK] $ which tiny_yolo_image 2>&1; ls -la /usr/bin/tiny_yolo_image 2>&1
+which: no tiny_yolo_image in ((null))
+-rwxr-xr-x 1 root root 9073784 Sep 19  2026 /usr/bin/tiny_yolo_image
+
+[OK] $ cd /home/root && test -s dog.jpg || wget -q http://192.168.1.100:8000/test_images/dog.jpg -O /home/root/dog.jpg; echo F_dog
+F_dog
+
+[OK] $ cd /home/root && test -s person.jpg || wget -q http://192.168.1.100:8000/test_images/person.jpg -O /home/root/person.jpg; echo F_person
+F_person
+
+[OK] $ cd /home/root && test -s eagle.jpg || wget -q http://192.168.1.100:8000/test_images/eagle.jpg -O /home/root/eagle.jpg; echo F_eagle
+F_eagle
+
+[OK] $ cd /home/root && test -s giraffe.jpg || wget -q http://192.168.1.100:8000/test_images/giraffe.jpg -O /home/root/giraffe.jpg; echo F_giraffe
+F_giraffe
+
+[OK] $ cd /home/root && test -s horses.jpg || wget -q http://192.168.1.100:8000/test_images/horses.jpg -O /home/root/horses.jpg; echo F_horses
+F_horses
+
+[OK] $ cd /home/root && test -s kite.jpg || wget -q http://192.168.1.100:8000/test_images/kite.jpg -O /home/root/kite.jpg; echo F_kite
+F_kite
+
+[OK] $ cd /home/root && test -s bike.jpg || wget -q http://192.168.1.100:8000/test_images/bike.jpg -O /home/root/bike.jpg; echo F_bike
+F_bike
+
+[OK] $ cd /home/root && test -s blackdog.jpg || wget -q http://192.168.1.100:8000/test_images/blackdog.jpg -O /home/root/blackdog.jpg; echo F_blackdog
+F_blackdog
+
+[OK] $ cd /home/root && tiny_yolo_image dog.jpg > batch_dog.txt 2>&1; echo D_dog
+
+
+[OK] $ cat /home/root/batch_dog.txt
+D_dog
+VOK_15
+sh-4.4# cat /home/root/batch_dog.txt; echo
+=== BATCH dog.jpg captured (55 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image person.jpg > batch_person.txt 2>&1; echo D_person
+D_person
+
+[OK] $ cat /home/root/batch_person.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH person.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image eagle.jpg > batch_eagle.txt 2>&1; echo D_eagle
+D_eagle
+
+[OK] $ cat /home/root/batch_eagle.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH eagle.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image giraffe.jpg > batch_giraffe.txt 2>&1; echo D_giraffe
+D_giraffe
+
+[OK] $ cat /home/root/batch_giraffe.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH giraffe.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image horses.jpg > batch_horses.txt 2>&1; echo D_horses
+D_horses
+
+[OK] $ cat /home/root/batch_horses.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH horses.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image kite.jpg > batch_kite.txt 2>&1; echo D_kite
+D_kite
+
+[OK] $ cat /home/root/batch_kite.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH kite.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image bike.jpg > batch_bike.txt 2>&1; echo D_bike
+D_bike
+
+[OK] $ cat /home/root/batch_bike.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH bike.jpg captured (954 bytes) ===
+
+[OK] $ cd /home/root && tiny_yolo_image blackdog.jpg > batch_blackdog.txt 2>&1; echo D_blackdog
+D_blackdog
+
+[OK] $ cat /home/root/batch_blackdog.txt
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3
+=== BATCH blackdog.jpg captured (954 bytes) ===
+=== FINAL_VALIDATION_END ===
+ IMAGE: dog.jpg
+D_dog
+VOK_15
+sh-4.4# cat /home/root/batch_dog.txt; echo
+### IMAGE: person.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: eagle.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: giraffe.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: horses.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: kite.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: bike.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'
+### IMAGE: blackdog.jpg
+******************************************************************
+* FATAL ERROR:                                                   *
+* This OpenCV build doesn't support current CPU/HW configuration *
+*                                                                *
+* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *
+******************************************************************
+
+Required baseline features:
+NEON - NOT AVAILABLE
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(3.4.3) /scratch/petalinux-yocto/yocto_downloads_2019.1_zynq-generic/build_zynq-generic/tmp/work/cortexa9t2hf-neon-xilinx-linux-gnueabi/opencv/3.4.3+gitAUTOINC+b38c50b3d0_1f6d6f0626_bdb7bb85f3_34e4206aef_fccf7cd6a4-r0/git/modules/core/src/system.cpp:535: error: (-215:Assertion failed) Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup. in function 'initialize'

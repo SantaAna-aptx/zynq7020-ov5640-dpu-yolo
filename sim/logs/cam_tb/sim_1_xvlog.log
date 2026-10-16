@@ -1,0 +1,12 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/ov5640_cam_top.v" into library work
+INFO: [VRFC 10-311] analyzing module ov5640_cam_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/async_fifo_18b.v" into library work
+INFO: [VRFC 10-311] analyzing module async_fifo_18b
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/I2C_OV5640_1280720_Config.v" into library work
+INFO: [VRFC 10-311] analyzing module I2C_OV5640_1280720_Config
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/i2c_timing_ctrl_reg16_dat8_wronly.v" into library work
+INFO: [VRFC 10-311] analyzing module i2c_timing_ctrl_reg16_dat8_wronly
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/yoloProject/rtl/cam_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module cam_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado2019.1/VIVADO20191/Vivado/2019.1/data/verilog/src/glbl.v" into library work
+INFO: [VRFC 10-311] analyzing module glbl

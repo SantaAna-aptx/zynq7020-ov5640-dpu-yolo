@@ -1,0 +1,104 @@
+
+****** xsim v2019.1 (64-bit)
+  **** SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
+  **** IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/cam_sim/xsim_script.tcl
+# xsim {cam_sim} -autoloadwcfg -runall
+Vivado Simulator 2019.1
+Time resolution is 1 ps
+run -all
+[TB-INFO] 仿真开始
+[BYTE] n=0 data=a0 href=1 vsync=0
+[BYTE] n=1 data=5b href=1 vsync=0
+[BYTE] n=2 data=a1 href=1 vsync=0
+[BYTE] n=3 data=5c href=1 vsync=0
+[BYTE] n=4 data=a2 href=1 vsync=0
+[BYTE] n=5 data=5d href=1 vsync=0
+[BYTE] n=6 data=a3 href=1 vsync=0
+[BYTE] n=7 data=5e href=1 vsync=0
+[BYTE] n=8 data=a4 href=1 vsync=0
+[BYTE] n=9 data=5f href=1 vsync=0
+[BYTE] n=10 data=a5 href=1 vsync=0
+[BYTE] n=11 data=60 href=1 vsync=0
+[BYTE] n=12 data=a6 href=1 vsync=0
+[BYTE] n=13 data=61 href=1 vsync=0
+[BYTE] n=14 data=a7 href=1 vsync=0
+[BYTE] n=15 data=62 href=1 vsync=0
+[BYTE] n=16 data=a8 href=1 vsync=0
+[BYTE] n=17 data=63 href=1 vsync=0
+[BYTE] n=18 data=a9 href=1 vsync=0
+[BYTE] n=19 data=64 href=1 vsync=0
+[BYTE] n=20 data=aa href=1 vsync=0
+[BYTE] n=21 data=65 href=1 vsync=0
+[BYTE] n=22 data=ab href=1 vsync=0
+[BYTE] n=23 data=66 href=1 vsync=0
+[BYTE] n=24 data=ac href=1 vsync=0
+[BYTE] n=25 data=67 href=1 vsync=0
+[BYTE] n=26 data=ad href=1 vsync=0
+[BYTE] n=27 data=68 href=1 vsync=0
+[BYTE] n=28 data=ae href=1 vsync=0
+[BYTE] n=29 data=69 href=1 vsync=0
+[BYTE] n=30 data=af href=1 vsync=0
+[BYTE] n=31 data=6a href=1 vsync=0
+[BYTE] n=32 data=a0 href=1 vsync=0
+[BYTE] n=33 data=5b href=1 vsync=0
+[BYTE] n=34 data=a1 href=1 vsync=0
+[BYTE] n=35 data=5c href=1 vsync=0
+[BYTE] n=36 data=a2 href=1 vsync=0
+[BYTE] n=37 data=5d href=1 vsync=0
+[BYTE] n=38 data=a3 href=1 vsync=0
+[BYTE] n=39 data=5e href=1 vsync=0
+[BYTE] n=40 data=a4 href=1 vsync=0
+[BYTE] n=41 data=5f href=1 vsync=0
+[BYTE] n=42 data=a5 href=1 vsync=0
+[BYTE] n=43 data=60 href=1 vsync=0
+[BYTE] n=44 data=a6 href=1 vsync=0
+[BYTE] n=45 data=61 href=1 vsync=0
+[BYTE] n=46 data=a7 href=1 vsync=0
+[BYTE] n=47 data=62 href=1 vsync=0
+[BYTE] n=48 data=a8 href=1 vsync=0
+[BYTE] n=49 data=63 href=1 vsync=0
+[BYTE] n=50 data=a9 href=1 vsync=0
+[BYTE] n=51 data=64 href=1 vsync=0
+[BYTE] n=52 data=aa href=1 vsync=0
+[BYTE] n=53 data=65 href=1 vsync=0
+[BYTE] n=54 data=ab href=1 vsync=0
+[BYTE] n=55 data=66 href=1 vsync=0
+[BYTE] n=56 data=ac href=1 vsync=0
+[BYTE] n=57 data=67 href=1 vsync=0
+[BYTE] n=58 data=ad href=1 vsync=0
+[BYTE] n=59 data=68 href=1 vsync=0
+[BYTE] n=60 data=ae href=1 vsync=0
+[BYTE] n=61 data=69 href=1 vsync=0
+[BYTE] n=62 data=af href=1 vsync=0
+[BYTE] n=63 data=6a href=1 vsync=0
+[BYTE] n=64 data=a0 href=1 vsync=0
+[BYTE] n=65 data=5b href=1 vsync=0
+[BYTE] n=66 data=a1 href=1 vsync=0
+[BYTE] n=67 data=5c href=1 vsync=0
+[BYTE] n=68 data=a2 href=1 vsync=0
+[BYTE] n=69 data=5d href=1 vsync=0
+[WR1] t=102235000 px_data=a05b sof=1 eol=0
+[WR2] t=102245000 px_data=a05b sof=1 eol=0
+[WR3] t=102255000 px_data=a05b sof=1 eol=0
+[WR4] t=102265000 px_data=a05b sof=1 eol=0
+[WR5] t=102315000 px_data=a15c sof=0 eol=0
+[WR6] t=102325000 px_data=a15c sof=0 eol=0
+[WR7] t=102335000 px_data=a15c sof=0 eol=0
+[WR8] t=102345000 px_data=a15c sof=0 eol=0
+[TB-INFO] 第一像素: a05b (tuser=1)
+[RD1] t=102455000 axis=a05b tuser=1 tlast=0
+[RD2] t=102535000 axis=a15c tuser=0 tlast=0
+[RD3] t=102615000 axis=a25d tuser=0 tlast=0
+[RD4] t=102705000 axis=a35e tuser=0 tlast=0
+[RD5] t=102785000 axis=a45f tuser=0 tlast=0
+[RD6] t=102865000 axis=a560 tuser=0 tlast=0
+[RD7] t=102955000 axis=a661 tuser=0 tlast=0
+[RD8] t=103035000 axis=a762 tuser=0 tlast=0
+[TB-PASS] 共校验 64 像素 / 4 帧, 错误 0
+SIM_RESULT=PASS
+$finish called at time : 110705 ns : File "E:/yoloProject/rtl/cam_tb.v" Line 73
+exit
+INFO: [Common 17-206] Exiting xsim at Sun Sep 13 13:28:19 2026...
